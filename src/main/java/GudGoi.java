@@ -31,8 +31,10 @@ public class GudGoi {
     // Claude (Anthropic), used through Claude Code, on 2026-08-20, from the
     // Level-2 requirements. The later change of `tasks` to ArrayList<Task>,
     // the matching updates to addTask and listTasks, and the mark and unmark
-    // methods, were generated the same way and on the same day. I reviewed the
-    // code before committing it.
+    // methods, were generated the same way and on the same day. The Level-4
+    // add methods (stripKeyword, addAndConfirm, addTodo, addDeadline,
+    // addEvent) were also generated the same way, from the Level-4 worked
+    // example. I reviewed the code before committing it.
     // ---------------------------------------------------------------------
 
     /** Horizontal rule printed above and below every response. */
@@ -65,13 +67,64 @@ public class GudGoi {
     }
 
     /**
-     * Wraps the user's text in a {@link Task}, stores it, and confirms it.
+     * Returns the value part of a {@code "/keyword value"} segment, so
+     * {@code "by Sunday"} becomes {@code "Sunday"}.
+     * Assumes the segment has a value after the keyword; Level-5 adds the checks.
      *
-     * @param description text the user entered
+     * @param segment one piece of the command, with its keyword still attached
+     * @return the text after the keyword
      */
-    private static void addTask(String description) {
-        tasks.add(new Task(description));
-        say("added: " + description);
+    private static String stripKeyword(String segment) {
+        return segment.split(" ", 2)[1].trim();
+    }
+
+    /**
+     * Stores a task and prints the confirmation shared by all three add
+     * commands, including the running total.
+     *
+     * @param task the task that was just built
+     */
+    private static void addAndConfirm(Task task) {
+        tasks.add(task);
+        say("Got it. I've added this task:\n  " + task
+                + "\nNow you have " + tasks.size()
+                + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+    }
+
+    /**
+     * Creates a todo, stores it, and confirms it.
+     *
+     * @param args the command text split on {@code "/"};
+     *             {@code args[0]} is the description
+     */
+    private static void addTodo(String[] args) {
+        addAndConfirm(new Todo(args[0].trim()));
+    }
+
+    /**
+     * Creates a deadline, stores it, and confirms it.
+     * Assumes a {@code /by} segment is present; Level-5 adds the checks.
+     *
+     * @param args the command text split on {@code "/"};
+     *             {@code args[0]} is the description, {@code args[1]} the
+     *             {@code "by ..."} segment
+     */
+    private static void addDeadline(String[] args) {
+        addAndConfirm(new Deadline(args[0].trim(), stripKeyword(args[1])));
+    }
+
+    /**
+     * Creates an event, stores it, and confirms it.
+     * Assumes {@code /from} and {@code /to} segments are present; Level-5 adds
+     * the checks.
+     *
+     * @param args the command text split on {@code "/"};
+     *             {@code args[0]} is the description, {@code args[1]} the
+     *             {@code "from ..."} segment, {@code args[2]} the
+     *             {@code "to ..."} segment
+     */
+    private static void addEvent(String[] args) {
+        addAndConfirm(new Event(args[0].trim(), stripKeyword(args[1]), stripKeyword(args[2])));
     }
 
     /** Prints every stored task, numbered from 1. */
@@ -121,30 +174,28 @@ public class GudGoi {
         printBanner();
         greet();
 
-        String cmd;
-        while (!(cmd = IO.readln().trim()).equals("bye")) {
-            String[] parts = cmd.split(" ", 2);
-            String word = parts[0];
+        String line;
+        while (!(line = IO.readln().trim()).equals("bye")) {
+            String[] parts = line.split(" ", 2);
+            String cmd = parts[0];
             String rest = parts.length > 1 ? parts[1] : "";
 
-            int n = 0;
-            boolean isNum = false;
-            try {
-                n = Integer.parseInt(rest);
-                isNum = true;
-            } catch (NumberFormatException e) {}
-            boolean toMark = false;
-
-            if (word.equals("list")) {
+            boolean toMark;
+            if (cmd.equals("list")) {
                 listTasks();
-            } else if ((toMark = word.equals("mark") || word.equals("unmark")) && isNum) {
+            } else if ((toMark = cmd.equals("mark")) || cmd.equals("unmark")) {
                 if (toMark) {
-                    mark(n);
+                    mark(Integer.parseInt(rest));
                 } else {
-                    unmark(n);
+                    unmark(Integer.parseInt(rest));
                 }
             } else {
-                addTask(cmd);
+                String[] rest_args = rest.split("/", 3);
+                switch (cmd) {
+                    case "todo" -> addTodo(rest_args);
+                    case "deadline" -> addDeadline(rest_args);
+                    case "event" -> addEvent(rest_args);
+                }
             }
         }
 
