@@ -1,25 +1,13 @@
-# Duke project template
+## Acknowledgements
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+### Development-only tools — not part of the product
 
-## Setting up in Intellij
+> **These are writing aids used while working on the project. None of them ship with the application.
+> No code from them appears in `src/`, none is bundled in the released JAR, and no part of the product
+> is derived from them. They affect documentation and notes only.**
 
-Prerequisites: JDK 25, update Intellij to the most recent version.
-
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 25** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Duke.java` file, right-click it, and choose `Run Duke.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
-
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+* **[asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill)** by Dustin Yuchen Teng, MIT License.
+  A Claude Code skill that rewrites English into [ASD-STE100 Simplified Technical English](https://www.asd-ste100.org/),
+  used to keep project documentation unambiguous.
+  Kept at `.claude/skills/asd-ste100/`, at commit [`d5ce157`](https://github.com/danyuchn/asd-ste100-skill/commit/d5ce157870cf9c41efd1d6e836706a2be3c7b9da) (13 Aug 2026).
+  The MIT licence text is retained in `.claude/skills/asd-ste100/LICENSE`.

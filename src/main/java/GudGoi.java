@@ -1,4 +1,4 @@
-public class Duke {
+public class GudGoi {
     private static void printBanner() {
         System.out.println(
             "   ___           _   _      _     ___      _ \n"
