@@ -25,6 +25,12 @@ public class GudGoi {
     public static void main(String[] args) {   
         printBanner();
         greet();
+
+        String cmd;
+        while (!(cmd = IO.readln()).equals("bye")) {
+            System.err.println(cmd + "\n");
+        }
+
         valediction();
     }
 }
