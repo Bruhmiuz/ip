@@ -81,35 +81,66 @@ public class GudGoi {
      *
      * @param details the command text after {@code todo}, the description
      */
-    private static void addTodo(String details) {
-        addAndConfirm(new Todo(details.trim()));
+    /**
+     * Creates a todo from the rest of the command and stores it.
+     *
+     * @param details the command text after {@code todo}, the description
+     * @throws TodoFormatException if no description was given
+     */
+    private static void addTodo(String details) throws TodoFormatException {
+        String description = details.trim();
+        if (description.isEmpty()) {
+            throw new TodoFormatException();
+        }
+        addAndConfirm(new Todo(description));
     }
 
     /**
      * Creates a deadline from the rest of the command and stores it.
-     * Assumes a {@code /by} part is present; Level-5 adds the checks.
      *
      * @param details the command text after {@code deadline}, in the form
      *                {@code description /by when}
+     * @throws DeadlineFormatException if the description or the /by part is missing
      */
-    private static void addDeadline(String details) {
+    private static void addDeadline(String details) throws DeadlineFormatException {
         String[] descriptionAndBy = details.split(" /by ", 2);
-        addAndConfirm(new Deadline(descriptionAndBy[0].trim(), descriptionAndBy[1].trim()));
+        if (descriptionAndBy.length < 2) {
+            throw new DeadlineFormatException();
+        }
+
+        String description = descriptionAndBy[0].trim();
+        String by = descriptionAndBy[1].trim();
+        if (description.isEmpty() || by.isEmpty()) {
+            throw new DeadlineFormatException();
+        }
+        addAndConfirm(new Deadline(description, by));
     }
 
     /**
      * Creates an event from the rest of the command and stores it.
-     * Assumes {@code /from} and {@code /to} parts are present; Level-5 adds
-     * the checks.
      *
      * @param details the command text after {@code event}, in the form
      *                {@code description /from start /to end}
+     * @throws EventFormatException if the description, /from or /to part is missing
      */
-    private static void addEvent(String details) {
+    private static void addEvent(String details) throws EventFormatException {
         String[] descriptionAndTimes = details.split(" /from ", 2);
+        if (descriptionAndTimes.length < 2) {
+            throw new EventFormatException();
+        }
+
         String[] fromAndTo = descriptionAndTimes[1].split(" /to ", 2);
-        addAndConfirm(new Event(descriptionAndTimes[0].trim(),
-                fromAndTo[0].trim(), fromAndTo[1].trim()));
+        if (fromAndTo.length < 2) {
+            throw new EventFormatException();
+        }
+
+        String description = descriptionAndTimes[0].trim();
+        String from = fromAndTo[0].trim();
+        String to = fromAndTo[1].trim();
+        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+            throw new EventFormatException();
+        }
+        addAndConfirm(new Event(description, from, to));
     }
 
     /** Prints every stored task, numbered from 1. */
@@ -130,29 +161,97 @@ public class GudGoi {
         }
         say(list.toString());
     }
+    /**
+     * Reads the task number the user typed and returns the task it points at.
+     *
+     * @param number the text the user gave after {@code mark} or {@code unmark}
+     * @return the task at that position
+     * @throws TaskNumberFormatException if the text is not a readable number
+     * @throws OutOfBoundException if no task sits at that position
+     */
+    private static Task taskAt(String number)
+            throws TaskNumberFormatException, OutOfBoundException {
+        String text = number.trim();
+        int index;
+        try {
+            index = Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            throw new TaskNumberFormatException(text);
+        }
+
+        if (index < 1 || index > tasks.size()) {
+            throw new OutOfBoundException(index, tasks.size());
+        }
+        // The user counts from 1, the list indexes from 0.
+        return tasks.get(index - 1);
+    }
 
     /**
-     * Marks the task at the given position as done, then confirms it.
-     * Assumes the position exists; Level-5 adds the checks.
+     * Marks the task the user named as done, then confirms it.
      *
-     * @param index position as shown to the user, counting from 1
+     * @param number the text the user gave after {@code mark}
+     * @throws TaskNumberFormatException if the text is not a readable number
+     * @throws OutOfBoundException if no task sits at that position
      */
-    private static void mark(int index) {
-        Task task = tasks.get(index - 1);
+    private static void mark(String number)
+            throws TaskNumberFormatException, OutOfBoundException {
+        Task task = taskAt(number);
         task.mark();
         say("Nice! I've marked this task as done:\n  " + task);
     }
 
     /**
-     * Marks the task at the given position as not done, then confirms it.
-     * Assumes the position exists; Level-5 adds the checks.
+     * Marks the task the user named as not done, then confirms it.
      *
-     * @param index position as shown to the user, counting from 1
+     * @param number the text the user gave after {@code unmark}
+     * @throws TaskNumberFormatException if the text is not a readable number
+     * @throws OutOfBoundException if no task sits at that position
      */
-    private static void unmark(int index) {
-        Task task = tasks.get(index - 1);
+    private static void unmark(String number)
+            throws TaskNumberFormatException, OutOfBoundException {
+        Task task = taskAt(number);
         task.unmark();
         say("OK, I've marked this task as not done yet:\n  " + task);
+    }
+
+    /**
+     * Carries out one line of input from the user.
+     * <p>
+     * The loop in {@link #main} reads lines; this method decides what a line
+     * means and does it. Anything the user got wrong leaves here as a
+     * {@link GudGoiException} for the caller to report.
+     *
+     * @param line one line the user typed, already trimmed
+     * @throws GudGoiException if the command or its arguments are unusable
+     */
+    private static void handle(String line) throws GudGoiException {
+        String[] parts = line.split(" ", 2);
+        String cmd = parts[0];
+        String rest = parts.length > 1 ? parts[1] : "";
+
+        switch (cmd) {
+        case "list" -> listTasks();
+        case "mark" -> mark(rest);
+        case "unmark" -> unmark(rest);
+        case "todo" -> addTodo(rest);
+        case "deadline" -> addDeadline(rest);
+        case "event" -> addEvent(rest);
+        default -> throw new CommandNotFoundException();
+        }
+    }
+
+    /**
+     * Reads one command from the user, with surrounding spaces removed.
+     * <p>
+     * End of input counts as {@code bye}: when there is nothing left to read,
+     * there is nobody left to talk to. Handling it here means the rest of the
+     * program never sees a null line.
+     *
+     * @return the next command, or {@code "bye"} once input has ended
+     */
+    private static String readCommand() {
+        String line = IO.readln();
+        return line == null ? "bye" : line.trim();
     }
 
     public static void main(String[] args) {
@@ -160,26 +259,11 @@ public class GudGoi {
         greet();
 
         String line;
-        while (!(line = IO.readln().trim()).equals("bye")) {
-            String[] parts = line.split(" ", 2);
-            String cmd = parts[0];
-            String rest = parts.length > 1 ? parts[1] : "";
-
-            boolean toMark;
-            if (cmd.equals("list")) {
-                listTasks();
-            } else if ((toMark = cmd.equals("mark")) || cmd.equals("unmark")) {
-                if (toMark) {
-                    mark(Integer.parseInt(rest));
-                } else {
-                    unmark(Integer.parseInt(rest));
-                }
-            } else {
-                switch (cmd) {
-                    case "todo" -> addTodo(rest);
-                    case "deadline" -> addDeadline(rest);
-                    case "event" -> addEvent(rest);
-                }
+        while (!(line = readCommand()).equals("bye")) {
+            try {
+                handle(line);
+            } catch (GudGoiException e) {
+                say(e.getMessage());
             }
         }
 

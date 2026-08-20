@@ -17,6 +17,9 @@ bin/
 Thumbs.db
 Desktop.ini
 
+# VS Code Code Runner scratch file
+tempCodeRunnerFile.java
+
 # Compiled Java output and JVM crash logs
 *.class
 hs_err_pid*.log
