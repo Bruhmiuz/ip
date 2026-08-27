@@ -5,15 +5,17 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The chatbot itself: it holds the task list and carries out commands.
+ * The chatbot itself: it works out what a command means, and asks the right
+ * class to do it.
  * <p>
- * It no longer talks to the user, and no longer touches the disk. {@link Ui}
- * and {@link Storage} do those, and this class asks them. Command parsing and
- * the list itself are still here, and {@code A-MoreOOP} moves each of them out
- * in turn.
+ * It no longer talks to the user, touches the disk, or holds the tasks.
+ * {@link Ui}, {@link Storage} and {@link TaskList} do those. What is left here
+ * is reading a command apart and deciding the order of the steps that answer
+ * it, including undoing a change that could not be saved. The command reading
+ * moves to a parser at the next step of {@code A-MoreOOP}.
  */
 public class GudGoi {
     // ---------------------------------------------------------------------
@@ -83,11 +85,13 @@ public class GudGoi {
     private static final Storage storage = new Storage(Path.of("data", "saved.txt"));
 
     /**
-     * Tasks entered so far, in the order they were added.
-     * {@link Storage} writes the list out whenever it changes, and gives it
-     * back when the program starts.
+     * The agenda. Like {@link #ui} and {@link #storage} it is {@code static}
+     * only because this class still is.
+     * <p>
+     * It is replaced, not filled, once storage has been asked for its
+     * contents, so it cannot be {@code final}.
      */
-    private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static TaskList tasks = new TaskList();
 
     /**
      * Reads a date, or a date and a time, from what the user typed.
@@ -136,9 +140,9 @@ public class GudGoi {
     private static void addAndConfirm(Task task) throws TaskSaveException {
         tasks.add(task);
         try {
-            storage.save(tasks);
+            storage.save(tasks.asList());
         } catch (TaskSaveException e) {
-            tasks.remove(tasks.size() - 1);
+            tasks.removeLast();
             throw e;
         }
         ui.show("Got it. I've added this task:\n  " + task
@@ -237,40 +241,41 @@ public class GudGoi {
             return;
         }
 
+        List<Task> all = tasks.asList();
         StringBuilder list = new StringBuilder();
-        for (int i = 0; i < tasks.size(); i++) {
+        for (int i = 0; i < all.size(); i++) {
             // Tasks are numbered from 1 for the user, but indexed from 0 here.
             // Task.toString() supplies the "[X] " or "[ ] " status box.
-            list.append(i + 1).append(".").append(tasks.get(i));
-            if (i < tasks.size() - 1) {
+            list.append(i + 1).append(".").append(all.get(i));
+            if (i < all.size() - 1) {
                 list.append("\n");
             }
         }
         ui.show(list.toString());
     }
     /**
-     * Reads the task number the user typed and returns the task it points at.
+     * Reads the task number the user typed.
+     * <p>
+     * Only the shape of the text is judged here. Whether a task actually sits
+     * at that position is {@link TaskList}'s to answer, because only the list
+     * knows how long it is.
+     * <p>
+     * This is command text, so it moves to the parser at the next step of
+     * {@code A-MoreOOP}.
      *
-     * @param number the text the user gave after {@code mark} or {@code unmark}
-     * @return the task at that position
+     * @param number the text the user gave after {@code mark}, {@code unmark}
+     *               or {@code delete}
+     * @return the position, counting from 1, unchecked against the list
      * @throws TaskNumberFormatException if the text is not a readable number
-     * @throws OutOfBoundException if no task sits at that position
      */
-    private static Task taskAt(String number)
-            throws TaskNumberFormatException, OutOfBoundException {
+    private static int parsePosition(String number)
+            throws TaskNumberFormatException {
         String text = number.trim();
-        int index;
         try {
-            index = Integer.parseInt(text);
+            return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             throw new TaskNumberFormatException(text);
         }
-
-        if (index < 1 || index > tasks.size()) {
-            throw new OutOfBoundException(index, tasks.size());
-        }
-        // The user counts from 1, the list indexes from 0.
-        return tasks.get(index - 1);
     }
 
     /**
@@ -284,13 +289,13 @@ public class GudGoi {
      */
     private static void mark(String number)
             throws TaskNumberFormatException, OutOfBoundException, TaskSaveException {
-        Task task = taskAt(number);
+        Task task = tasks.get(parsePosition(number));
         // The task may already be done, so the undo restores what was there
         // before rather than assuming it was not done.
         boolean wasMarked = task.isMarked();
         task.mark();
         try {
-            storage.save(tasks);
+            storage.save(tasks.asList());
         } catch (TaskSaveException e) {
             if (!wasMarked) {
                 task.unmark();
@@ -311,11 +316,11 @@ public class GudGoi {
      */
     private static void unmark(String number)
             throws TaskNumberFormatException, OutOfBoundException, TaskSaveException {
-        Task task = taskAt(number);
+        Task task = tasks.get(parsePosition(number));
         boolean wasMarked = task.isMarked();
         task.unmark();
         try {
-            storage.save(tasks);
+            storage.save(tasks.asList());
         } catch (TaskSaveException e) {
             if (wasMarked) {
                 task.mark();
@@ -336,13 +341,12 @@ public class GudGoi {
      */
     private static void deleteTask(String number)
             throws TaskNumberFormatException, OutOfBoundException, TaskSaveException {
-        Task task = taskAt(number);
-        int position = tasks.indexOf(task);
-        tasks.remove(position);
+        int position = parsePosition(number);
+        Task task = tasks.remove(position);
         try {
-            storage.save(tasks);
+            storage.save(tasks.asList());
         } catch (TaskSaveException e) {
-            tasks.add(position, task);
+            tasks.insert(position, task);
             throw e;
         }
         ui.show("Noted. I've removed this task:\n  " + task
@@ -388,7 +392,7 @@ public class GudGoi {
         ui.showGreeting();
 
         try {
-            tasks.addAll(storage.load());
+            tasks = new TaskList(storage.load());
         } catch (TaskLoadException e) {
             // A missing or damaged file costs the old agenda, not the session.
             ui.showError(e.getMessage());

@@ -7,6 +7,18 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Extract the task list into a TaskList class
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+27 August 2026, for A-MoreOOP. The bounds check inside `get` and `remove` is my
+Level-5 code, moved from `taskAt`; the class, its constructors and the rest were
+generated.
+
+* `src/main/java/TaskList.java` — whole file
+* `src/main/java/GudGoi.java` — the change of `tasks` to a `TaskList`, the split
+  of `taskAt` into `parsePosition` plus the list's own bounds check, and the undo
+  paths in `addAndConfirm`, `mark`, `unmark` and `deleteTask`
+
 #### Extract file handling into a Storage class
 
 Claude (Anthropic), used through Claude Code, generated the code below on
