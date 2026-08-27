@@ -4,36 +4,41 @@
 // Claude Code, on 2026-08-20, from my specification: use inheritance to
 // create the Level-4 task subclasses. The getTypeLetter and toSaveFormat
 // methods were generated the same way on 2026-08-27, for the Level-7 save
-// format. I reviewed the code before committing it.
+// format. The change from String times to LocalDateTime was generated the same
+// way on 2026-08-27, for Level-8. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
+
+import java.time.LocalDateTime;
 
 /**
  * A task that runs between two times, for example
- * {@code project meeting /from Mon 2pm /to 4pm}.
+ * {@code project meeting /from 2019-10-15 1400 /to 2019-10-15 1600}.
  * <p>
- * Shown to the user as {@code [E][ ] project meeting (from: Mon 2pm to: 4pm)}.
+ * Shown to the user as
+ * {@code [E][ ] project meeting (from: Oct 15 2019, 14:00 to: Oct 15 2019, 16:00)}.
  */
 public class Event extends Task {
     /**
-     * When the event starts.
-     * Level-4 keeps this as free text; Level-8 turns it into a real date.
+     * When the event starts, as a point in time rather than as text.
+     * A user who gives only a date gets midnight at the start of that day.
      */
-    private final String from;
+    private final LocalDateTime from;
 
     /**
-     * When the event ends.
-     * Level-4 keeps this as free text; Level-8 turns it into a real date.
+     * When the event ends, as a point in time rather than as text.
+     * A user who gives only a date gets the last minute of that day, so that a
+     * whole-day event covers the whole day.
      */
-    private final String to;
+    private final LocalDateTime to;
 
     /**
      * Creates an event that is not done yet.
      *
      * @param description text the user entered
-     * @param from when the event starts, as the user wrote it
-     * @param to when the event ends, as the user wrote it
+     * @param from when the event starts
+     * @param to when the event ends
      */
-    public Event(String description, String from, String to) {
+    public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
         this.from = from;
         this.to = to;
@@ -42,18 +47,18 @@ public class Event extends Task {
     /**
      * Returns when this event starts.
      *
-     * @return the start time, as the user wrote it
+     * @return the start time
      */
-    public String getFrom() {
+    public LocalDateTime getFrom() {
         return this.from;
     }
 
     /**
      * Returns when this event ends.
      *
-     * @return the end time, as the user wrote it
+     * @return the end time
      */
-    public String getTo() {
+    public LocalDateTime getTo() {
         return this.to;
     }
 
@@ -69,12 +74,14 @@ public class Event extends Task {
 
     @Override
     public String toSaveFormat() {
-        return super.toSaveFormat() + " | " + escape(this.from)
-                + " | " + escape(this.to);
+        // The ISO form of a LocalDateTime holds no | of its own, so neither
+        // field needs escaping.
+        return super.toSaveFormat() + " | " + this.from + " | " + this.to;
     }
 
     @Override
     public String toString() {
-        return super.toString() + " (from: " + this.from + " to: " + this.to + ")";
+        return super.toString() + " (from: " + this.from.format(DISPLAY_FORMAT)
+                + " to: " + this.to.format(DISPLAY_FORMAT) + ")";
     }
 }

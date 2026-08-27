@@ -4,29 +4,33 @@
 // Claude Code, on 2026-08-20, from my specification: use inheritance to
 // create the Level-4 task subclasses. The getTypeLetter and toSaveFormat
 // methods were generated the same way on 2026-08-27, for the Level-7 save
-// format. I reviewed the code before committing it.
+// format. The change from a String time to a LocalDateTime was generated the
+// same way on 2026-08-27, for Level-8. I reviewed the code before committing
+// it.
 // ---------------------------------------------------------------------
+
+import java.time.LocalDateTime;
 
 /**
  * A task that must be finished by a given time, for example
- * {@code return book /by Sunday}.
+ * {@code return book /by 2019-10-15}.
  * <p>
- * Shown to the user as {@code [D][ ] return book (by: Sunday)}.
+ * Shown to the user as {@code [D][ ] return book (by: Oct 15 2019, 00:00)}.
  */
 public class Deadline extends Task {
     /**
-     * When the task is due.
-     * Level-4 keeps this as free text; Level-8 turns it into a real date.
+     * When the task is due, as a point in time rather than as text.
+     * A user who gives only a date gets midnight at the start of that day.
      */
-    private final String by;
+    private final LocalDateTime by;
 
     /**
      * Creates a deadline that is not done yet.
      *
      * @param description text the user entered
-     * @param by when the task is due, as the user wrote it
+     * @param by when the task is due
      */
-    public Deadline(String description, String by) {
+    public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;
     }
@@ -34,9 +38,9 @@ public class Deadline extends Task {
     /**
      * Returns when this task is due.
      *
-     * @return the due time, as the user wrote it
+     * @return the due time
      */
-    public String getBy() {
+    public LocalDateTime getBy() {
         return this.by;
     }
 
@@ -52,11 +56,14 @@ public class Deadline extends Task {
 
     @Override
     public String toSaveFormat() {
-        return super.toSaveFormat() + " | " + escape(this.by);
+        // LocalDateTime.toString gives the ISO form, 2019-10-15T18:00, which
+        // LocalDateTime.parse reads back exactly. It holds no | of its own, so
+        // it needs no escaping.
+        return super.toSaveFormat() + " | " + this.by;
     }
 
     @Override
     public String toString() {
-        return super.toString() + " (by: " + this.by + ")";
+        return super.toString() + " (by: " + this.by.format(DISPLAY_FORMAT) + ")";
     }
 }

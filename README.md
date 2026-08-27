@@ -7,6 +7,29 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Replace free-text times with real dates
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+27 August 2026, from my specification of the Level-8 date handling: accept a
+date on its own or a date with a time, store both as a date and time, default a
+deadline to 00:00 and an event's end to 23:59, and reject an event that ends
+before it starts.
+
+* `src/main/java/GudGoi.java` — `INPUT_WITH_TIME`, `INPUT_DATE_ONLY`,
+  `DEADLINE_DEFAULT_TIME`, `EVENT_END_DEFAULT_TIME`, `parseDateTime`, the date
+  handling and the ordering check in `addDeadline` and `addEvent`, the ISO
+  parsing in `parseSavedTask`, and the older-version line in
+  `discardCorruptFile`
+* `src/main/java/DateFormatException.java` — whole file
+* `src/main/java/EventFormatException.java` — the constructor for an event that
+  ends before it starts
+* `src/main/java/Deadline.java` — the change of `by` to `LocalDateTime`, and the
+  matching changes to the constructor, `getBy`, `toSaveFormat` and `toString`
+* `src/main/java/Event.java` — the change of `from` and `to` to `LocalDateTime`,
+  and the matching changes to the constructor, `getFrom`, `getTo`,
+  `toSaveFormat` and `toString`
+* `src/main/java/Task.java` — `DISPLAY_FORMAT`
+
 #### Add saving and loading of the task list
 
 Claude (Anthropic), used through Claude Code, generated the code below on
