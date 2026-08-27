@@ -1,4 +1,8 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GudGoi {
     private static void printBanner() {
@@ -39,8 +43,18 @@ public class GudGoi {
             "____________________________________________________________";
 
     /**
+     * Where the agenda is stored between runs, relative to the folder the
+     * program is started from.
+     * <p>
+     * {@link Path#of} joins the parts with the separator the host system uses,
+     * so this one line works on Windows and on Linux without a change.
+     */
+    private static final Path SAVE_PATH = Path.of("data", "saved.txt");
+
+    /**
      * Tasks entered so far, in the order they were added.
-     * These are kept in memory only; saving to disk comes in Level-7.
+     * The list is written to {@link #SAVE_PATH} whenever it changes, and read
+     * back when the program starts.
      */
     private static final ArrayList<Task> tasks = new ArrayList<>();
 
@@ -68,9 +82,17 @@ public class GudGoi {
      * commands, including the running total.
      *
      * @param task the task that was just built
+     * @throws TaskSaveException if the new list cannot be written, in which
+     *                           case the task is taken out again
      */
-    private static void addAndConfirm(Task task) {
+    private static void addAndConfirm(Task task) throws TaskSaveException {
         tasks.add(task);
+        try {
+            save();
+        } catch (TaskSaveException e) {
+            tasks.remove(tasks.size() - 1);
+            throw e;
+        }
         say("Got it. I've added this task:\n  " + task
                 + "\nNow you have " + tasks.size()
                 + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
@@ -86,8 +108,10 @@ public class GudGoi {
      *
      * @param details the command text after {@code todo}, the description
      * @throws TodoFormatException if no description was given
+     * @throws TaskSaveException if the new list cannot be written
      */
-    private static void addTodo(String details) throws TodoFormatException {
+    private static void addTodo(String details)
+            throws TodoFormatException, TaskSaveException {
         String description = details.trim();
         if (description.isEmpty()) {
             throw new TodoFormatException();
@@ -101,8 +125,10 @@ public class GudGoi {
      * @param details the command text after {@code deadline}, in the form
      *                {@code description /by when}
      * @throws DeadlineFormatException if the description or the /by part is missing
+     * @throws TaskSaveException if the new list cannot be written
      */
-    private static void addDeadline(String details) throws DeadlineFormatException {
+    private static void addDeadline(String details)
+            throws DeadlineFormatException, TaskSaveException {
         String[] descriptionAndBy = details.split(" /by ", 2);
         if (descriptionAndBy.length < 2) {
             throw new DeadlineFormatException();
@@ -122,8 +148,10 @@ public class GudGoi {
      * @param details the command text after {@code event}, in the form
      *                {@code description /from start /to end}
      * @throws EventFormatException if the description, /from or /to part is missing
+     * @throws TaskSaveException if the new list cannot be written
      */
-    private static void addEvent(String details) throws EventFormatException {
+    private static void addEvent(String details)
+            throws EventFormatException, TaskSaveException {
         String[] descriptionAndTimes = details.split(" /from ", 2);
         if (descriptionAndTimes.length < 2) {
             throw new EventFormatException();
@@ -192,11 +220,24 @@ public class GudGoi {
      * @param number the text the user gave after {@code mark}
      * @throws TaskNumberFormatException if the text is not a readable number
      * @throws OutOfBoundException if no task sits at that position
+     * @throws TaskSaveException if the change cannot be written, in which case
+     *                           it is undone
      */
     private static void mark(String number)
-            throws TaskNumberFormatException, OutOfBoundException {
+            throws TaskNumberFormatException, OutOfBoundException, TaskSaveException {
         Task task = taskAt(number);
+        // The task may already be done, so the undo restores what was there
+        // before rather than assuming it was not done.
+        boolean wasMarked = task.isMarked();
         task.mark();
+        try {
+            save();
+        } catch (TaskSaveException e) {
+            if (!wasMarked) {
+                task.unmark();
+            }
+            throw e;
+        }
         say("Nice! I've marked this task as done:\n  " + task);
     }
 
@@ -206,29 +247,209 @@ public class GudGoi {
      * @param number the text the user gave after {@code unmark}
      * @throws TaskNumberFormatException if the text is not a readable number
      * @throws OutOfBoundException if no task sits at that position
+     * @throws TaskSaveException if the change cannot be written, in which case
+     *                           it is undone
      */
     private static void unmark(String number)
-            throws TaskNumberFormatException, OutOfBoundException {
+            throws TaskNumberFormatException, OutOfBoundException, TaskSaveException {
         Task task = taskAt(number);
+        boolean wasMarked = task.isMarked();
         task.unmark();
+        try {
+            save();
+        } catch (TaskSaveException e) {
+            if (wasMarked) {
+                task.mark();
+            }
+            throw e;
+        }
         say("OK, I've marked this task as not done yet:\n  " + task);
     }
 
     /**
-     * Deleted the task the user named.
+     * Deletes the task the user named.
      *
      * @param number the text the user gave after {@code delete}
      * @throws TaskNumberFormatException if the text is not a readable number
      * @throws OutOfBoundException if no task sits at that position
+     * @throws TaskSaveException if the shorter list cannot be written, in which
+     *                           case the task is put back where it was
      */
     private static void deleteTask(String number)
-            throws TaskNumberFormatException, OutOfBoundException {
+            throws TaskNumberFormatException, OutOfBoundException, TaskSaveException {
         Task task = taskAt(number);
-        tasks.remove(task);
-        say("Noted. I've removed this task:\n  " + task 
-        + "\nNow you have " + tasks.size() + " task(s) in the list.");
+        int position = tasks.indexOf(task);
+        tasks.remove(position);
+        try {
+            save();
+        } catch (TaskSaveException e) {
+            tasks.add(position, task);
+            throw e;
+        }
+        say("Noted. I've removed this task:\n  " + task
+                + "\nNow you have " + tasks.size() + " task(s) in the list.");
     }
 
+
+    // ---------------------------------------------------------------------
+    // AI-ASSISTED CODE — CITATION
+    // The SAVE_PATH field and the methods save, parseSavedTask, unescape, load
+    // and discardCorruptFile were generated by Claude (Anthropic), used through
+    // Claude Code, on 2026-08-27, from my specification for Level-7: one line
+    // per task in the form "type | marked | text | by/from | to", stored in
+    // data/saved.txt, written whenever the list changes and read at start-up,
+    // with a | inside a field escaped as \|, a failed write undone and
+    // reported, and a file that does not match the format deleted. I reviewed
+    // the code before committing it.
+    // ---------------------------------------------------------------------
+
+    /**
+     * Writes the whole task list to {@link #SAVE_PATH}, one task per line.
+     * <p>
+     * The file is rewritten in full rather than appended to, because a change
+     * can be a deletion or a mark as easily as an addition. The list is small,
+     * so the simpler approach costs nothing worth measuring.
+     * <p>
+     * A failure to write is raised, not swallowed. The caller undoes whatever
+     * it just did to the list and lets the user retry, so what the user sees
+     * never disagrees with what is on disk.
+     *
+     * @throws TaskSaveException if the file or its folder cannot be written
+     */
+    private static void save() throws TaskSaveException {
+        try {
+            Files.createDirectories(SAVE_PATH.getParent());
+
+            List<String> lines = new ArrayList<>();
+            for (Task task : tasks) {
+                lines.add(task.toSaveFormat());
+            }
+            Files.write(SAVE_PATH, lines);
+        } catch (IOException e) {
+            throw new TaskSaveException(e.getMessage());
+        }
+    }
+
+    /**
+     * Rebuilds one task from one line of the save file.
+     * <p>
+     * Writing is the task's own job, because the object already knows what it
+     * is. Reading cannot be, because there is no object yet — the type letter
+     * decides which class to build. That is why this factory sits here while
+     * {@link Task#toSaveFormat()} sits on the task.
+     *
+     * @param line one line of the save file
+     * @return the task the line describes, or {@code null} if the line cannot
+     *         be read
+     */
+    private static Task parseSavedTask(String line) {
+        // A separator is a | that no backslash protects. The lookbehind is what
+        // keeps an escaped \| inside a description from splitting the line.
+        String[] fields = line.trim().split("\\s*(?<!\\\\)\\|\\s*");
+        if (fields.length < 3) {
+            return null;
+        }
+
+        // The done flag is the only field with a fixed set of values, so it is
+        // the cheapest place to notice that a line is not one of ours.
+        if (!fields[1].equals("0") && !fields[1].equals("1")) {
+            return null;
+        }
+
+        // Each type has an exact field count. A line with more fields than its
+        // type allows is not a line this program wrote, so it is rejected
+        // rather than read in part.
+        String description = unescape(fields[2]);
+        Task task = switch (fields[0]) {
+        case "T" -> fields.length != 3 ? null : new Todo(description);
+        case "D" -> fields.length != 4 ? null
+                : new Deadline(description, unescape(fields[3]));
+        case "E" -> fields.length != 5 ? null
+                : new Event(description, unescape(fields[3]), unescape(fields[4]));
+        default -> null;
+        };
+
+        if (task != null && fields[1].equals("1")) {
+            task.mark();
+        }
+        return task;
+    }
+
+    /**
+     * Returns the original text of a field read from the save file, undoing
+     * {@link Task#escape(String)}.
+     *
+     * @param field one field of a save-file line, as it was stored
+     * @return the text the user typed
+     */
+    private static String unescape(String field) {
+        return field.replace("\\|", "|");
+    }
+
+    /**
+     * Fills the task list from {@link #SAVE_PATH}.
+     * <p>
+     * A missing file is normal on a first run and is not an error.
+     * <p>
+     * A file with even one line that does not match the format is not trusted
+     * at all. A file this program did not write may hold anything, and a part
+     * of an agenda read out of a damaged file is worse than no agenda, because
+     * the user cannot see what is missing. Such a file is deleted and the user
+     * is told at start-up.
+     * <p>
+     * Tasks are collected into a separate list first, so a bad line found near
+     * the end cannot leave the program holding half a file.
+     */
+    private static void load() {
+        if (!Files.exists(SAVE_PATH)) {
+            return;
+        }
+
+        List<Task> loaded = new ArrayList<>();
+        try {
+            for (String line : Files.readAllLines(SAVE_PATH)) {
+                if (line.isBlank()) {
+                    continue;
+                }
+
+                Task task = parseSavedTask(line);
+                if (task == null) {
+                    discardCorruptFile(line);
+                    return;
+                }
+                loaded.add(task);
+            }
+        } catch (IOException e) {
+            say("I could not read your saved agenda: " + e.getMessage()
+                    + "\nI have started with an empty list, and I have left the"
+                    + " file alone.");
+            return;
+        }
+
+        tasks.addAll(loaded);
+    }
+
+    /**
+     * Deletes a save file that does not match the format, and says so.
+     * <p>
+     * The offending line is quoted, because the user may be able to see what
+     * damaged it, and because a deletion the user cannot explain is alarming.
+     *
+     * @param badLine the first line that could not be read
+     */
+    private static void discardCorruptFile(String badLine) {
+        String problem = "Your save file does not match the format I write."
+                + "\nThe first line I could not read was:\n  " + badLine;
+        try {
+            Files.delete(SAVE_PATH);
+            say(problem + "\nI have deleted the file and started with an empty"
+                    + " agenda.");
+        } catch (IOException e) {
+            say(problem + "\nI could not delete it either: " + e.getMessage()
+                    + "\nI have started with an empty agenda. Your next change"
+                    + " will overwrite the file.");
+        }
+    }
 
     /**
      * Carries out one line of input from the user.
@@ -271,9 +492,16 @@ public class GudGoi {
         return line == null ? "bye" : line.trim();
     }
 
+    /**
+     * Starts the bot: greets the user, restores the saved agenda, then reads
+     * and carries out commands until {@code bye} or the end of input.
+     *
+     * @param args ignored; the bot takes no command line arguments
+     */
     public static void main(String[] args) {
         printBanner();
         greet();
+        load();
 
         String line;
         while (!(line = readCommand()).equals("bye")) {

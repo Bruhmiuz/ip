@@ -25,6 +25,9 @@ tempCodeRunnerFile.java
 hs_err_pid*.log
 replay_pid*.log
 
+# Saved session files
+/data/saved.txt
+
 # Packaged builds. The Gradle wrapper jar must stay tracked, so it is excepted.
 *.jar
 !gradle/wrapper/gradle-wrapper.jar

@@ -4,8 +4,9 @@
 // Claude Code, on 2026-08-20, from my specification: a Task class in its
 // own file with a boolean `marked` field. The getTypeIcon hook and the
 // matching change to toString, added for the Level-4 subclasses, were
-// generated the same way and on the same day. I reviewed the code before
-// committing it.
+// generated the same way and on the same day. The getTypeLetter, toSaveFormat
+// and escape methods were generated the same way on 2026-08-27, for the
+// Level-7 save format. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
 /**
@@ -67,6 +68,49 @@ public class Task {
      */
     protected String getTypeIcon() {
         return "";
+    }
+
+    /**
+     * Returns the single letter that identifies this kind of task in the save
+     * file, for example {@code T}. A plain task has no letter; each subclass
+     * supplies its own.
+     *
+     * @return the type letter for this kind of task
+     */
+    protected String getTypeLetter() {
+        return "";
+    }
+
+    /**
+     * Returns the task as one line of the save file, for example
+     * {@code T | 1 | read book}. Fields are separated by {@code " | "}, and a
+     * done task carries {@code 1} while a task still to do carries {@code 0}.
+     * Subclasses append the extra fields they hold.
+     * <p>
+     * This is deliberately separate from {@link #toString()}. The display form
+     * exists for the user to read and is free to change; the save form is data
+     * that {@code GudGoi.parseSavedTask} has to read back.
+     *
+     * @return the storage form of this task
+     */
+    public String toSaveFormat() {
+        return this.getTypeLetter() + " | " + (this.marked ? "1" : "0")
+                + " | " + escape(this.description);
+    }
+
+    /**
+     * Returns text that is safe to write as one field of a save-file line.
+     * <p>
+     * A {@code |} inside the text would look like a field separator when the
+     * line is read back, which would shift every field after it. Writing it as
+     * {@code \|} keeps the field count right. {@code GudGoi.parseSavedTask}
+     * reverses this.
+     *
+     * @param text the raw text of one field
+     * @return the text with every {@code |} written as {@code \|}
+     */
+    protected static String escape(String text) {
+        return text.replace("|", "\\|");
     }
 
     /**

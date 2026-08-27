@@ -1,5 +1,26 @@
 ## Acknowledgements
 
+### AI-assisted code
+
+Code in `src/` that an AI tool generated is listed here, one entry per commit,
+newest first. Each entry names the files and the methods involved. The same
+information appears as a comment beside the code itself. Entries start with the
+commits of 27 August 2026; earlier commits carry the code comments only.
+
+#### Add saving and loading of the task list
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+27 August 2026, from my specification of the Level-7 save format.
+
+* `src/main/java/GudGoi.java` — `SAVE_PATH`, `save`, `parseSavedTask`,
+  `unescape`, `load`, `discardCorruptFile`, and the undo-on-failure blocks in
+  `addAndConfirm`, `mark`, `unmark` and `deleteTask`
+* `src/main/java/TaskSaveException.java` — whole file
+* `src/main/java/Task.java` — `getTypeLetter`, `toSaveFormat`, `escape`
+* `src/main/java/Deadline.java` — `getTypeLetter`, `toSaveFormat`
+* `src/main/java/Event.java` — `getTypeLetter`, `toSaveFormat`
+* `src/main/java/Todo.java` — `getTypeLetter`
+
 ### Development-only tools — not part of the product
 
 > **These are writing aids used while working on the project. None of them ship with the application.
