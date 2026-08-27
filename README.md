@@ -19,6 +19,18 @@ position in the agenda.
 * `src/main/java/gudgoi/exception/FindFormatException.java` — whole file
 * `src/test/java/gudgoi/ParserTest.java` — the four `parseKeyword` tests
 
+#### Correct the Javadoc and cover every method
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+28 August 2026, for A-JavaDoc. Nothing but comments changed.
+
+* `src/main/java/gudgoi/GudGoi.java` — the corrected `@throws` and `{@link}` in
+  `mark`, `unmark`, `deleteTask` and `handle`
+* `src/main/java/gudgoi/task/Task.java` — the corrected references in
+  `toSaveFormat` and `escape`
+* `src/main/java/gudgoi/task/Todo.java`, `Deadline.java`, `Event.java` — header
+  comments on the ten overriding methods
+
 #### Add JUnit tests for parser, storage and task list
 
 Claude (Anthropic), used through Claude Code, generated the code below on

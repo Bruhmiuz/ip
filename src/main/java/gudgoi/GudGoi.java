@@ -101,6 +101,7 @@ public class GudGoi {
         }
         ui.show(list.toString());
     }
+
     /**
      * Prints the tasks whose description holds the keyword.
      * <p>
@@ -143,9 +144,9 @@ public class GudGoi {
      *
      * @param number the text the user gave after {@code mark}
      * @throws GudGoiException if the text is not a number, no task sits at
-     *                         that position, or the change cannot be saved
-     * @throws TaskSaveException if the change cannot be written, in which case
-     *                           it is undone
+     *                         that position, or the change cannot be saved. A
+     *                         change that cannot be saved is undone first, so
+     *                         the list still matches the file.
      */
     private void mark(String number)
             throws GudGoiException {
@@ -170,9 +171,9 @@ public class GudGoi {
      *
      * @param number the text the user gave after {@code unmark}
      * @throws GudGoiException if the text is not a number, no task sits at
-     *                         that position, or the change cannot be saved
-     * @throws TaskSaveException if the change cannot be written, in which case
-     *                           it is undone
+     *                         that position, or the change cannot be saved. A
+     *                         change that cannot be saved is undone first, so
+     *                         the list still matches the file.
      */
     private void unmark(String number)
             throws GudGoiException {
@@ -195,9 +196,9 @@ public class GudGoi {
      *
      * @param number the text the user gave after {@code delete}
      * @throws GudGoiException if the text is not a number, no task sits at
-     *                         that position, or the change cannot be saved
-     * @throws TaskSaveException if the shorter list cannot be written, in which
-     *                           case the task is put back where it was
+     *                         that position, or the change cannot be saved. A
+     *                         deletion that cannot be saved is undone, and the
+     *                         task goes back where it was.
      */
     private void deleteTask(String number)
             throws GudGoiException {
@@ -213,11 +214,10 @@ public class GudGoi {
                 + "\nNow you have " + tasks.size() + " task(s) in the list.");
     }
 
-
     /**
      * Carries out one line of input from the user.
      * <p>
-     * The loop in {@link #main} reads lines; this method decides what a line
+     * The loop in {@link #run()} reads lines; this method decides what a line
      * means and does it. Anything the user got wrong leaves here as a
      * {@link GudGoiException} for the caller to report.
      *

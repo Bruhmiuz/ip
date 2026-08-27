@@ -64,16 +64,23 @@ public class Event extends Task {
         return this.to;
     }
 
+    /** {@inheritDoc} An event shows {@code [E]}. */
     @Override
     protected String getTypeIcon() {
         return "[E]";
     }
 
+    /** {@inheritDoc} An event is stored as {@code E}. */
     @Override
     protected String getTypeLetter() {
         return "E";
     }
 
+    /**
+     * {@inheritDoc}
+     * An event appends two fields, its start and its end, both in the
+     * ISO form that {@link gudgoi.Storage} reads back.
+     */
     @Override
     public String toSaveFormat() {
         // The ISO form of a LocalDateTime holds no | of its own, so neither
@@ -81,6 +88,11 @@ public class Event extends Task {
         return super.toSaveFormat() + " | " + this.from + " | " + this.to;
     }
 
+    /**
+     * {@inheritDoc}
+     * An event appends {@code (from: ... to: ...)}, with both times
+     * written the way a person reads them.
+     */
     @Override
     public String toString() {
         return super.toString() + " (from: " + this.from.format(DISPLAY_FORMAT)
