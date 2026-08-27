@@ -6,8 +6,12 @@
 // matching change to toString, added for the Level-4 subclasses, were
 // generated the same way and on the same day. The getTypeLetter, toSaveFormat
 // and escape methods were generated the same way on 2026-08-27, for the
-// Level-7 save format. I reviewed the code before committing it.
+// Level-7 save format. The DISPLAY_FORMAT field was generated the same way on
+// 2026-08-27, for the Level-8 date handling. I reviewed the code before
+// committing it.
 // ---------------------------------------------------------------------
+
+import java.time.format.DateTimeFormatter;
 
 /**
  * One item on the user's agenda.
@@ -16,6 +20,17 @@
  * Tasks start off not done.
  */
 public class Task {
+    /**
+     * How a date and time is shown to the user, for example
+     * {@code Oct 15 2019, 18:00}.
+     * <p>
+     * It sits here because both subclasses that carry times need it, and
+     * because deciding how a task looks is this class's job. It is deliberately
+     * not the format the user types, nor the format the save file holds.
+     */
+    protected static final DateTimeFormatter DISPLAY_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy, HH:mm");
+
     /** Text the user entered to describe this task. */
     private final String description;
 
