@@ -2,10 +2,19 @@
 
 ### AI-assisted code
 
-Code in `src/` that an AI tool generated is listed here, one entry per commit,
+Code in this repository that an AI tool generated is listed here, one entry per commit,
 newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
+
+#### Point Gradle at this project
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+28 August 2026, for A-Gradle. The rest of `build.gradle` and the Gradle wrapper
+came from the course repository and are not my work or Claude's.
+
+* `build.gradle` — the two names that identify this project: `mainClass` and the
+  name of the packaged JAR
 
 #### Organize the classes into packages
 
