@@ -7,6 +7,18 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Extract command reading into a Parser class
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+27 August 2026, for A-MoreOOP. The method bodies inside `Parser` are my earlier
+Level-4 to Level-8 code, moved; the class, the split of a line into a command
+word and its arguments, and the header comments were generated.
+
+* `src/main/java/Parser.java` — whole file
+* `src/main/java/GudGoi.java` — the removal of `addTodo`, `addDeadline`,
+  `addEvent`, `parseDateTime` and `parsePosition`, and the rewrite of `handle`
+  to ask `Parser` for the command word, the arguments and the task
+
 #### Extract the task list into a TaskList class
 
 Claude (Anthropic), used through Claude Code, generated the code below on
