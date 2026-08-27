@@ -7,6 +7,18 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Add a find command
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+28 August 2026, for Level-9, from my decision that a match keeps its real
+position in the agenda.
+
+* `src/main/java/gudgoi/GudGoi.java` — `findTasks`, and the `find` case in the
+  dispatch
+* `src/main/java/gudgoi/Parser.java` — `parseKeyword`
+* `src/main/java/gudgoi/exception/FindFormatException.java` — whole file
+* `src/test/java/gudgoi/ParserTest.java` — the four `parseKeyword` tests
+
 #### Add JUnit tests for parser, storage and task list
 
 Claude (Anthropic), used through Claude Code, generated the code below on

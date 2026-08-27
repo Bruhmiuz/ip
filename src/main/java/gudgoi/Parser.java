@@ -19,6 +19,7 @@ import java.time.format.ResolverStyle;
 import gudgoi.exception.DateFormatException;
 import gudgoi.exception.DeadlineFormatException;
 import gudgoi.exception.EventFormatException;
+import gudgoi.exception.FindFormatException;
 import gudgoi.exception.TaskNumberFormatException;
 import gudgoi.exception.TodoFormatException;
 import gudgoi.task.Deadline;
@@ -109,6 +110,21 @@ public class Parser {
         } catch (NumberFormatException e) {
             throw new TaskNumberFormatException(text);
         }
+    }
+
+    /**
+     * Reads the word a {@code find} command is to search for.
+     *
+     * @param details the command text after {@code find}
+     * @return the keyword, with surrounding blanks removed
+     * @throws FindFormatException if nothing was given to search for
+     */
+    public static String parseKeyword(String details) throws FindFormatException {
+        String keyword = details.trim();
+        if (keyword.isEmpty()) {
+            throw new FindFormatException();
+        }
+        return keyword;
     }
 
     /**

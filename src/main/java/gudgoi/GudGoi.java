@@ -102,6 +102,43 @@ public class GudGoi {
         ui.show(list.toString());
     }
     /**
+     * Prints the tasks whose description holds the keyword.
+     * <p>
+     * Each match keeps the number it has in the full agenda, not a number
+     * counted from the first match. The user can therefore type
+     * {@code mark 4} against what they see, rather than counting the list
+     * again to find out what 4 means.
+     * <p>
+     * The search ignores case, because a person looking for a word rarely
+     * remembers how they capitalised it.
+     *
+     * @param keyword the word to look for in the descriptions
+     */
+    private void findTasks(String keyword) {
+        String wanted = keyword.toLowerCase();
+        List<Task> all = tasks.asList();
+
+        StringBuilder matches = new StringBuilder();
+        for (int i = 0; i < all.size(); i++) {
+            Task task = all.get(i);
+            if (!task.getDescription().toLowerCase().contains(wanted)) {
+                continue;
+            }
+            if (matches.length() > 0) {
+                matches.append("\n");
+            }
+            // The position the user would type, not the position among matches.
+            matches.append(i + 1).append(".").append(task);
+        }
+
+        if (matches.length() == 0) {
+            ui.show("Nothing on the agenda matches \"" + keyword + "\".");
+            return;
+        }
+        ui.show("Here are the matching tasks in your list:\n" + matches);
+    }
+
+    /**
      * Marks the task the user named as done, then confirms it.
      *
      * @param number the text the user gave after {@code mark}
@@ -201,6 +238,7 @@ public class GudGoi {
         case "deadline" -> addAndConfirm(Parser.parseDeadline(rest));
         case "event" -> addAndConfirm(Parser.parseEvent(rest));
         case "delete" -> deleteTask(rest);
+        case "find" -> findTasks(Parser.parseKeyword(rest));
         default -> throw new CommandNotFoundException();
         }
     }

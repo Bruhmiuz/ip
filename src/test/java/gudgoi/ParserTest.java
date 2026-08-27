@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import gudgoi.exception.DateFormatException;
 import gudgoi.exception.DeadlineFormatException;
 import gudgoi.exception.EventFormatException;
+import gudgoi.exception.FindFormatException;
 import gudgoi.exception.TaskNumberFormatException;
 import gudgoi.exception.TodoFormatException;
 import gudgoi.task.Deadline;
@@ -172,6 +173,28 @@ public class ParserTest {
     public void parseEvent_noToPart_throwsEventFormatException() {
         assertThrows(EventFormatException.class,
                 () -> Parser.parseEvent("meeting /from 2019-10-15"));
+    }
+
+    // ---------- find ----------
+
+    @Test
+    public void parseKeyword_word_returnsItWithoutSurroundingBlanks() throws Exception {
+        assertEquals("book", Parser.parseKeyword("  book  "));
+    }
+
+    @Test
+    public void parseKeyword_severalWords_keepsThemAll() throws Exception {
+        assertEquals("read book", Parser.parseKeyword("read book"));
+    }
+
+    @Test
+    public void parseKeyword_nothingToSearchFor_throwsFindFormatException() {
+        assertThrows(FindFormatException.class, () -> Parser.parseKeyword(""));
+    }
+
+    @Test
+    public void parseKeyword_blanksOnly_throwsFindFormatException() {
+        assertThrows(FindFormatException.class, () -> Parser.parseKeyword("   "));
     }
 
     // ---------- task number ----------
