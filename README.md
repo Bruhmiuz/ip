@@ -7,6 +7,15 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Turn GudGoi into an object with a constructor
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+27 August 2026, for A-MoreOOP.
+
+* `src/main/java/GudGoi.java` — the constructor, the change of `ui`, `storage`
+  and `tasks` from static fields to instance fields, the move of the session
+  into `run`, and the reduction of `main` to one line
+
 #### Extract command reading into a Parser class
 
 Claude (Anthropic), used through Claude Code, generated the code below on

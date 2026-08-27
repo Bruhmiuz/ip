@@ -2,7 +2,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * The chatbot itself: it holds the four parts together and decides the order
+ * The chatbot itself: one bot, holding the four parts and deciding the order
  * they work in.
  * <p>
  * {@link Ui} speaks and listens, {@link Storage} keeps the file,
@@ -23,31 +23,35 @@ public class GudGoi {
     // it, and rewrote parts of it myself.
     // ---------------------------------------------------------------------
 
-    /**
-     * The one way in and out for anything the user sees or types.
-     * <p>
-     * It is {@code static} only because this class still is. It becomes an
-     * ordinary field when the class gains a constructor.
-     */
-    private static final Ui ui = new Ui();
+    /** The one way in and out for anything the user sees or types. */
+    private final Ui ui;
+
+    /** The agenda on disk. */
+    private final Storage storage;
 
     /**
-     * The agenda on disk. Like {@link #ui} it is {@code static} only because
-     * this class still is.
-     * <p>
-     * The path is built from its parts, so the separator is the host system's
-     * own and the same line works on Windows and on Linux.
-     */
-    private static final Storage storage = new Storage(Path.of("data", "saved.txt"));
-
-    /**
-     * The agenda. Like {@link #ui} and {@link #storage} it is {@code static}
-     * only because this class still is.
+     * The agenda in memory.
      * <p>
      * It is replaced, not filled, once storage has been asked for its
      * contents, so it cannot be {@code final}.
      */
-    private static TaskList tasks = new TaskList();
+    private TaskList tasks;
+
+    /**
+     * Builds a bot that keeps its agenda in one file.
+     * <p>
+     * It wires the parts together and nothing else. Reading the file is left
+     * to {@link #run()}, so that the user is greeted before being told
+     * anything about a file, and so that building a bot cannot fail.
+     *
+     * @param savePath where the agenda is kept, relative to the folder the
+     *                 program runs in
+     */
+    public GudGoi(Path savePath) {
+        this.ui = new Ui();
+        this.storage = new Storage(savePath);
+        this.tasks = new TaskList();
+    }
 
     /**
      * Stores a task and prints the confirmation shared by all three add
@@ -57,7 +61,7 @@ public class GudGoi {
      * @throws TaskSaveException if the new list cannot be written, in which
      *                           case the task is taken out again
      */
-    private static void addAndConfirm(Task task) throws TaskSaveException {
+    private void addAndConfirm(Task task) throws TaskSaveException {
         tasks.add(task);
         try {
             storage.save(tasks.asList());
@@ -71,7 +75,7 @@ public class GudGoi {
     }
 
     /** Prints every stored task, numbered from 1. */
-    private static void listTasks() {
+    private void listTasks() {
         if (tasks.isEmpty()) {
             ui.show("Nothing on the agenda yet.");
             return;
@@ -98,7 +102,7 @@ public class GudGoi {
      * @throws TaskSaveException if the change cannot be written, in which case
      *                           it is undone
      */
-    private static void mark(String number)
+    private void mark(String number)
             throws GudGoiException {
         Task task = tasks.get(Parser.parsePosition(number));
         // The task may already be done, so the undo restores what was there
@@ -125,7 +129,7 @@ public class GudGoi {
      * @throws TaskSaveException if the change cannot be written, in which case
      *                           it is undone
      */
-    private static void unmark(String number)
+    private void unmark(String number)
             throws GudGoiException {
         Task task = tasks.get(Parser.parsePosition(number));
         boolean wasMarked = task.isMarked();
@@ -150,7 +154,7 @@ public class GudGoi {
      * @throws TaskSaveException if the shorter list cannot be written, in which
      *                           case the task is put back where it was
      */
-    private static void deleteTask(String number)
+    private void deleteTask(String number)
             throws GudGoiException {
         int position = Parser.parsePosition(number);
         Task task = tasks.remove(position);
@@ -175,7 +179,7 @@ public class GudGoi {
      * @param line one line the user typed, already trimmed
      * @throws GudGoiException if the command or its arguments are unusable
      */
-    private static void handle(String line) throws GudGoiException {
+    private void handle(String line) throws GudGoiException {
         String command = Parser.commandWord(line);
         String rest = Parser.arguments(line);
 
@@ -194,12 +198,14 @@ public class GudGoi {
     }
 
     /**
-     * Starts the bot: greets the user, restores the saved agenda, then reads
+     * Runs one session: greets the user, restores the saved agenda, then reads
      * and carries out commands until {@code bye} or the end of input.
-     *
-     * @param args ignored; the bot takes no command line arguments
+     * <p>
+     * The agenda is read here rather than in the constructor, so that the
+     * greeting comes first. A user who is told their save file was deleted
+     * before the bot has said hello has no idea who is talking.
      */
-    public static void main(String[] args) {
+    public void run() {
         ui.showBanner();
         ui.showGreeting();
 
@@ -220,5 +226,17 @@ public class GudGoi {
         }
 
         ui.showFarewell();
+    }
+
+    /**
+     * Starts the bot.
+     * <p>
+     * {@link Path#of} joins the parts with the separator the host system uses,
+     * so this one line works on Windows and on Linux without a change.
+     *
+     * @param args ignored; the bot takes no command line arguments
+     */
+    public static void main(String[] args) {
+        new GudGoi(Path.of("data", "saved.txt")).run();
     }
 }
