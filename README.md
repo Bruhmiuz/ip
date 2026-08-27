@@ -7,6 +7,17 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Extract user interaction into a Ui class
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+27 August 2026, for A-MoreOOP. The method bodies inside `Ui` are my earlier
+code, moved unchanged; the class, its header comments and the call-site changes
+were generated.
+
+* `src/main/java/Ui.java` — whole file
+* `src/main/java/GudGoi.java` — the `ui` field, the class header comment, and
+  the change of every print and every read to go through `Ui`
+
 #### Replace free-text times with real dates
 
 Claude (Anthropic), used through Claude Code, generated the code below on
