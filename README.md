@@ -7,6 +7,18 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Extract file handling into a Storage class
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+27 August 2026, for A-MoreOOP. The method bodies inside `Storage` are my earlier
+Level-7 and Level-8 code, moved; the class, its constructor and the change from
+printing to raising an Exception were generated.
+
+* `src/main/java/Storage.java` — whole file
+* `src/main/java/TaskLoadException.java` — whole file
+* `src/main/java/GudGoi.java` — the `storage` field, and the change of the save
+  and load call sites
+
 #### Extract user interaction into a Ui class
 
 Claude (Anthropic), used through Claude Code, generated the code below on
