@@ -7,6 +7,8 @@
 // generated. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +16,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+
+import gudgoi.exception.TaskLoadException;
+import gudgoi.exception.TaskSaveException;
+import gudgoi.task.Deadline;
+import gudgoi.task.Event;
+import gudgoi.task.Task;
+import gudgoi.task.Todo;
 
 /**
  * Keeps the agenda on disk between runs.

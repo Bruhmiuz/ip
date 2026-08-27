@@ -5,6 +5,8 @@
 // types. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.exception;
+
 /**
  * The task number read correctly, but no task sits at that position.
  * <p>

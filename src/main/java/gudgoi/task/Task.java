@@ -11,6 +11,8 @@
 // committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.task;
+
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -27,8 +29,13 @@ public class Task {
      * It sits here because both subclasses that carry times need it, and
      * because deciding how a task looks is this class's job. It is deliberately
      * not the format the user types, nor the format the save file holds.
+     * <p>
+     * It is public because a message about a task may have to show a time the
+     * same way, and the class that writes such a message is not a task. A
+     * {@link DateTimeFormatter} cannot be changed once built, so sharing this
+     * one hands out no control over it.
      */
-    protected static final DateTimeFormatter DISPLAY_FORMAT =
+    public static final DateTimeFormatter DISPLAY_FORMAT =
             DateTimeFormatter.ofPattern("MMM dd yyyy, HH:mm");
 
     /** Text the user entered to describe this task. */

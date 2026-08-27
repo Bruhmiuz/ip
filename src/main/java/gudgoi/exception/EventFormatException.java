@@ -7,7 +7,11 @@
 // 2026-08-27, for Level-8. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.exception;
+
 import java.time.LocalDateTime;
+
+import gudgoi.task.Task;
 
 /**
  * An {@code event} command could not be turned into an event.

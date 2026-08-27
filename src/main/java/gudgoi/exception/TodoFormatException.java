@@ -5,11 +5,12 @@
 // types. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
-/** A {@code deadline} command was missing its description or its /by part. */
-public class DeadlineFormatException extends GudGoiException {
-    /** Creates the Exception for a malformed deadline command. */
-    public DeadlineFormatException() {
-        super("OOPS!!! A deadline needs a description and a time, like:\n"
-                + "  deadline return book /by Sunday");
+package gudgoi.exception;
+
+/** A {@code todo} command arrived without a description. */
+public class TodoFormatException extends GudGoiException {
+    /** Creates the Exception for a malformed todo command. */
+    public TodoFormatException() {
+        super("OOPS!!! The description of a todo cannot be empty.");
     }
 }

@@ -6,6 +6,10 @@
 // I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.exception;
+
+import gudgoi.Storage;
+
 /**
  * The saved agenda could not be read.
  * <p>

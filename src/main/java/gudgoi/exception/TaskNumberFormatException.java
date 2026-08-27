@@ -5,6 +5,8 @@
 // types. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.exception;
+
 /**
  * The text given where a task number was expected could not be read as a
  * number at all. Either it is not digits, or it is too large for an

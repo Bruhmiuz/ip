@@ -5,10 +5,12 @@
 // types. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
-/** A {@code todo} command arrived without a description. */
-public class TodoFormatException extends GudGoiException {
-    /** Creates the Exception for a malformed todo command. */
-    public TodoFormatException() {
-        super("OOPS!!! The description of a todo cannot be empty.");
+package gudgoi.exception;
+
+/** The first word of the input is not a command the bot knows. */
+public class CommandNotFoundException extends GudGoiException {
+    /** Creates the Exception for an unrecognised command. */
+    public CommandNotFoundException() {
+        super("OOPS!!! I'm sorry, but I don't know what that means :-(");
     }
 }

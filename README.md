@@ -7,6 +7,18 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Organize the classes into packages
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+28 August 2026, for A-Packages. The change is mechanical: no method body was
+altered.
+
+* all 19 files under `src/main/java/gudgoi/` — the `package` declaration, and
+  the `import` lines for the project classes each file now reaches across a
+  package boundary
+* `src/main/java/gudgoi/task/Task.java` — the change of `DISPLAY_FORMAT` from
+  `protected` to `public`, and the comment explaining why
+
 #### Turn GudGoi into an object with a constructor
 
 Claude (Anthropic), used through Claude Code, generated the code below on

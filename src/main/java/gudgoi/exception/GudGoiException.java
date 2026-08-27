@@ -5,6 +5,8 @@
 // types. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.exception;
+
 /**
  * Something the user did wrong that the bot can explain and recover from.
  * <p>

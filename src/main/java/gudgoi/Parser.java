@@ -7,12 +7,23 @@
 // comments were generated. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+
+import gudgoi.exception.DateFormatException;
+import gudgoi.exception.DeadlineFormatException;
+import gudgoi.exception.EventFormatException;
+import gudgoi.exception.TaskNumberFormatException;
+import gudgoi.exception.TodoFormatException;
+import gudgoi.task.Deadline;
+import gudgoi.task.Event;
+import gudgoi.task.Todo;
 
 /**
  * Turns what the user typed into something the program can act on.

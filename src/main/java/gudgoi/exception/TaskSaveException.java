@@ -6,6 +6,9 @@
 // success. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.exception;
+
+
 /**
  * The task list could not be written to disk.
  * <p>

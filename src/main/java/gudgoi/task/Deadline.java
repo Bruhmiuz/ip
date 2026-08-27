@@ -9,6 +9,8 @@
 // it.
 // ---------------------------------------------------------------------
 
+package gudgoi.task;
+
 import java.time.LocalDateTime;
 
 /**

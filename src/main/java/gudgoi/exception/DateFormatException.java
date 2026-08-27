@@ -6,6 +6,8 @@
 // time. I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.exception;
+
 /** Text given as a time was neither a date nor a date with a time. */
 public class DateFormatException extends GudGoiException {
     /**

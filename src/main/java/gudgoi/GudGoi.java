@@ -1,5 +1,13 @@
+package gudgoi;
+
 import java.nio.file.Path;
 import java.util.List;
+
+import gudgoi.exception.CommandNotFoundException;
+import gudgoi.exception.GudGoiException;
+import gudgoi.exception.TaskLoadException;
+import gudgoi.exception.TaskSaveException;
+import gudgoi.task.Task;
 
 /**
  * The chatbot itself: one bot, holding the four parts and deciding the order

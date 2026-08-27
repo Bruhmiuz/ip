@@ -7,6 +7,8 @@
 // committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi.task;
+
 /**
  * A task with no date attached, for example {@code visit new theme park}.
  * <p>

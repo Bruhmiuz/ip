@@ -6,6 +6,8 @@
 // I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi;
+
 /**
  * Everything the bot says to the user, and everything it hears back.
  * <p>

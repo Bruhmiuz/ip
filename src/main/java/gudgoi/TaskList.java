@@ -7,9 +7,14 @@
 // committing it.
 // ---------------------------------------------------------------------
 
+package gudgoi;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import gudgoi.exception.OutOfBoundException;
+import gudgoi.task.Task;
 
 /**
  * The agenda: the tasks, in the order the user added them.
