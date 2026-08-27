@@ -46,16 +46,23 @@ public class Deadline extends Task {
         return this.by;
     }
 
+    /** {@inheritDoc} A deadline shows {@code [D]}. */
     @Override
     protected String getTypeIcon() {
         return "[D]";
     }
 
+    /** {@inheritDoc} A deadline is stored as {@code D}. */
     @Override
     protected String getTypeLetter() {
         return "D";
     }
 
+    /**
+     * {@inheritDoc}
+     * A deadline appends one field: the time it is due, in the ISO
+     * form, which is what {@link gudgoi.Storage} reads back.
+     */
     @Override
     public String toSaveFormat() {
         // LocalDateTime.toString gives the ISO form, 2019-10-15T18:00, which
@@ -64,6 +71,11 @@ public class Deadline extends Task {
         return super.toSaveFormat() + " | " + this.by;
     }
 
+    /**
+     * {@inheritDoc}
+     * A deadline appends {@code (by: ...)}, with the time written the
+     * way a person reads it rather than the way it is stored.
+     */
     @Override
     public String toString() {
         return super.toString() + " (by: " + this.by.format(DISPLAY_FORMAT) + ")";

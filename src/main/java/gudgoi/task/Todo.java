@@ -24,11 +24,13 @@ public class Todo extends Task {
         super(description);
     }
 
+    /** {@inheritDoc} A todo shows {@code [T]}. */
     @Override
     protected String getTypeIcon() {
         return "[T]";
     }
 
+    /** {@inheritDoc} A todo is stored as {@code T}. */
     @Override
     protected String getTypeLetter() {
         return "T";

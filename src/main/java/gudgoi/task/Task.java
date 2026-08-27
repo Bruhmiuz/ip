@@ -111,7 +111,7 @@ public class Task {
      * <p>
      * This is deliberately separate from {@link #toString()}. The display form
      * exists for the user to read and is free to change; the save form is data
-     * that {@code GudGoi.parseSavedTask} has to read back.
+     * that {@link gudgoi.Storage} has to read back.
      *
      * @return the storage form of this task
      */
@@ -125,8 +125,8 @@ public class Task {
      * <p>
      * A {@code |} inside the text would look like a field separator when the
      * line is read back, which would shift every field after it. Writing it as
-     * {@code \|} keeps the field count right. {@code GudGoi.parseSavedTask}
-     * reverses this.
+     * {@code \|} keeps the field count right. {@link gudgoi.Storage}
+     * reverses this when it reads the line.
      *
      * @param text the raw text of one field
      * @return the text with every {@code |} written as {@code \|}
