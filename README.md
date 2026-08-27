@@ -7,6 +7,16 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Add JUnit tests for parser, storage and task list
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+28 August 2026, for A-JUnit. The cases come from edge cases I had already found
+by running the program by hand.
+
+* `src/test/java/gudgoi/ParserTest.java` — whole file
+* `src/test/java/gudgoi/StorageTest.java` — whole file
+* `src/test/java/gudgoi/TaskListTest.java` — whole file
+
 #### Point Gradle at this project
 
 Claude (Anthropic), used through Claude Code, generated the code below on
