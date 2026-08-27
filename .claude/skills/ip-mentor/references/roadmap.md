@@ -1,6 +1,6 @@
 # iP roadmap
 
-Fetched 2026-08-20 from the AY26/27 S1 course website. Later weeks are subject to change — re-fetch before relying on them.
+Fetched 2026-08-20 from the AY26/27 S1 course website. Weeks 2 and 3 re-fetched 2026-08-27. Later weeks are subject to change — re-fetch before relying on them.
 
 ## Week arc
 
@@ -13,7 +13,9 @@ Fetched 2026-08-20 from the AY26/27 S1 course website. Later weeks are subject t
 | 6 | At least two of `A-BetterGui`, `A-Personality`, `A-MoreErrorHandling`, `A-MoreTesting`. Product website with `Ui.png` + User Guide. JAR + GitHub release. **Final submission.** | **Fri 18 Sep 2359** |
 | 7 | Optional: AI features branch, further polish. | — |
 
-Week 2 mechanics: work directly on `master`, no branches. Tag the finished commit of each increment with the exact increment ID (`Level-2`, `A-Enums`). Push code **and** tags. Late submission allowed within one week without penalty.
+Week 2 mechanics: work directly on `master`, no branches. Tag the finished commit of each increment with the exact increment ID (`Level-2`, `A-Enums`). Push code **and** tags. Late submission allowed within one week without penalty. `A-Enums` was **optional**; `Level-0`..`Level-6` were required.
+
+Week 3 mechanics (fetched 2026-08-27): branches start. `Level-7`, `Level-8`, `A-JavaDoc`, `A-CodingStandard`, and `Level-9` each get a `branch-{ID}` branch, merged back with `--no-ff`, and the **merge commit** carries the tag. `A-MoreOOP`, `A-Packages`, `A-Gradle`, `A-JUnit`, `A-Jar` are done on `master`. Push `master`, the branches, and the tags. A PR from the fork's `master` to the upstream `master`, named `[{name or username}] iP`, is a deliverable and stays open. The Git commit message standard is required from this week; only future commits are checked. Details in `week3-plan.md`.
 
 ## Grading — 15 marks, pass/fail cliff
 
