@@ -7,6 +7,9 @@
 // The greeting and the farewell were moved into constants the same way on
 // 2026-09-05, for Level-10, so that the window and the console can say the
 // same words without one copying the other.
+// The change of show to a variable arity method was generated the same way
+// on 2026-09-05, from my decision that a caller should be able to hand over
+// a response line by line instead of joining it first.
 // ---------------------------------------------------------------------
 
 package gudgoi;
@@ -82,15 +85,24 @@ public class Ui {
 
     /**
      * Prints one response, wrapped in divider lines.
-     * Every line of {@code body} is printed separately, so a multi-line
-     * response such as the task list stays aligned.
+     * <p>
+     * A caller may pass the whole response as one string, or a part for each
+     * line, or a mix of the two. Every part is broken at its own {@code \n}
+     * before it is printed, so a multi-line response such as the task list
+     * stays aligned however it was put together.
+     * <p>
+     * Each line is printed on its own rather than in one call, so that the
+     * separator between lines is the one this system uses. A {@code \n} inside
+     * a string stays a {@code \n} on a system whose lines end another way.
      *
-     * @param body text to show, using {@code \n} to separate lines.
+     * @param parts the text to show, in the order it is to appear.
      */
-    public void show(String body) {
+    public void show(String... parts) {
         System.out.println(DIVIDER);
-        for (String line : body.split("\n")) {
-            System.out.println(line);
+        for (String part : parts) {
+            for (String line : part.split("\n")) {
+                System.out.println(line);
+            }
         }
         System.out.println(DIVIDER + "\n");
     }

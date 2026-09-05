@@ -7,6 +7,15 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Let Ui.show take a line for each argument
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+5 September 2026, from my decision that a caller should be able to hand over a
+response line by line instead of joining it first.
+
+* `src/main/java/gudgoi/Ui.java` — the change of `show` to a variable arity
+  method, and the nested loop that breaks each part at its own newline
+
 #### Add a window, and keep the console
 
 Claude (Anthropic), used through Claude Code, generated the code below on
