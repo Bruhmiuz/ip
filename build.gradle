@@ -16,6 +16,20 @@ repositories {
 
 dependencies {
     String jUnitVersion = '5.14.4'
+    String javaFxVersion = '17.0.7'
+
+    // Every platform is listed on purpose. The classifiers pull in the native
+    // libraries for each operating system, so the one shadow JAR that is
+    // handed in runs on a marker's machine whatever it happens to be.
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:linux"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
 
@@ -38,7 +52,10 @@ test {
 }
 
 application {
-    mainClass = 'gudgoi.GudGoi'
+    // The window is the product, so it is what the JAR starts.
+    // The console version is still here and still works. Run it with:
+    //   java -cp build/libs/gudgoi.jar gudgoi.GudGoi
+    mainClass = 'gudgoi.gui.Launcher'
 }
 
 jar {

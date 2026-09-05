@@ -4,23 +4,39 @@
 // Claude Code, on 2026-08-27, for A-MoreOOP. The method bodies were moved
 // unchanged from GudGoi, where I had written them over Level-0 to Level-7.
 // I reviewed the code before committing it.
+// The greeting and the farewell were moved into constants the same way on
+// 2026-09-05, for Level-10, so that the window and the console can say the
+// same words without one copying the other.
 // ---------------------------------------------------------------------
 
 package gudgoi;
 
 /**
- * Everything the bot says to the user, and everything it hears back.
+ * Everything the bot says to the console, and everything it hears back.
  * <p>
  * The rest of the program decides <em>what</em> to tell the user. This class
- * decides <em>how</em> it looks: the divider lines, the banner, the blank line
- * after each response. Nothing outside this class writes to the screen or
- * reads from the keyboard, so a later move to a window rather than a console
- * changes this class alone.
+ * decides <em>how</em> it looks on a console: the divider lines, the banner,
+ * the blank line after each response. Nothing outside this class writes to the
+ * screen or reads from the keyboard.
+ * <p>
+ * The window built for Level-10 does not use the {@code show} methods, because
+ * a divider drawn out of underscores means nothing in a chat bubble. It does
+ * use {@link #getGreeting()} and {@link #getFarewell()}, so the words the bot
+ * opens and closes with are written once and shown by both front ends.
  */
 public class Ui {
     /** Horizontal rule printed above and below every response. */
     private static final String DIVIDER =
             "____________________________________________________________";
+
+    /** The opening words, said by the console and by the window alike. */
+    private static final String GREETING =
+            "Hello, I am the Gud Goi, your friendly neighbourhood pro-ISR bot.\n"
+            + "What's on the agenda today?";
+
+    /** The closing words, said by the console and by the window alike. */
+    private static final String FAREWELL =
+            "Bhai bhai. Even from afar, I'm always watching.";
 
     /** Prints the name of the bot as block letters. */
     public void showBanner() {
@@ -33,19 +49,35 @@ public class Ui {
         );
     }
 
+    /**
+     * Returns the opening words, without printing them.
+     * <p>
+     * The window needs the text rather than the act of printing it, because it
+     * puts the words in a bubble instead of on standard output.
+     *
+     * @return the greeting, with no divider and no trailing blank line.
+     */
+    public String getGreeting() {
+        return GREETING;
+    }
+
     /** Prints the opening words, before the first command is read. */
     public void showGreeting() {
-        System.out.println(
-                "Hello, I am the Gud Goi, your friendly neighbourhood pro-ISR bot.\n"
-                + "What's on the agenda today?\n"
-        );
+        System.out.println(GREETING + "\n");
+    }
+
+    /**
+     * Returns the closing words, without printing them.
+     *
+     * @return the farewell, with no divider and no trailing blank line.
+     */
+    public String getFarewell() {
+        return FAREWELL;
     }
 
     /** Prints the closing words, after the last command. */
     public void showFarewell() {
-        System.out.println(
-                "Bhai bhai. Even from afar, I'm always watching.\n"
-        );
+        System.out.println(FAREWELL + "\n");
     }
 
     /**

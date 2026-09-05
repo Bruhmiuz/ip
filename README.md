@@ -7,6 +7,24 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Add a window, and keep the console
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+5 September 2026, for Level-10, from the JavaFX tutorial and from my decision
+that the window and the console must run the same commands. The window layout
+comes from the tutorial; the wiring to `GudGoi` is new.
+
+* `src/main/java/gudgoi/gui/Launcher.java` — whole file
+* `src/main/java/gudgoi/gui/MainWindow.java` — whole file
+* `src/main/java/gudgoi/gui/DialogBox.java` — whole file
+* `src/main/java/gudgoi/GudGoi.java` — the change of `addAndConfirm`,
+  `listTasks`, `findTasks`, `mark`, `unmark`, `deleteTask` and `handle` from
+  printing to returning their text, and the new `getGreeting`, `loadTasks`,
+  `getResponse` and `isExit`
+* `src/main/java/gudgoi/Ui.java` — the `GREETING` and `FAREWELL` constants, and
+  `getGreeting` and `getFarewell`
+* `build.gradle` — the JavaFX dependencies, and the change of `mainClass`
+
 #### Apply the peer review feedback and set up Checkstyle
 
 Claude (Anthropic), used through Claude Code, generated the code below on
@@ -169,6 +187,21 @@ Claude (Anthropic), used through Claude Code, generated the code below on
 * `src/main/java/Deadline.java` — `getTypeLetter`, `toSaveFormat`
 * `src/main/java/Event.java` — `getTypeLetter`, `toSaveFormat`
 * `src/main/java/Todo.java` — `getTypeLetter`
+
+### Third-party libraries
+
+* **[JavaFX](https://openjfx.io/)** 17.0.7, GPLv2 with the Classpath Exception.
+  The window, its layout and its event handling all come from this library.
+  It is pulled in by `build.gradle` and is bundled in the shadow JAR, which is
+  why the JAR carries the native libraries for Windows, macOS and Linux.
+
+### Course material used
+
+* The layout of the window and the two-shape dialog box follow the
+  [JavaFX tutorial](https://se-education.org/guides/tutorials/javaFx.html)
+  from se-education.org.
+* `src/main/resources/images/DaUser.jpg` and `DaDuke.jpg` are the sample
+  avatars from the same tutorial.
 
 ### Development-only tools — not part of the product
 

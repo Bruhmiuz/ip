@@ -31,6 +31,9 @@ public class GudGoi {
     // it, and rewrote parts of it myself.
     // The command loop in run was rewritten the same way on 2026-09-03, after a
     // peer review asked for the assignment to come out of the while condition.
+    // The change from printing to returning text, and getGreeting, loadTasks,
+    // getResponse and isExit, were generated the same way on 2026-09-05, for
+    // Level-10, so that a window can use the same commands as the console.
     // ---------------------------------------------------------------------
 
     /** The one way in and out for anything the user sees or types. */
@@ -64,14 +67,15 @@ public class GudGoi {
     }
 
     /**
-     * Stores a task and prints the confirmation shared by all three add
+     * Stores a task and builds the confirmation shared by all three add
      * commands, including the running total.
      *
      * @param task the task that was just built.
+     * @return the words to show the user.
      * @throws TaskSaveException if the new list cannot be written, in which
      *                           case the task is taken out again.
      */
-    private void addAndConfirm(Task task) throws TaskSaveException {
+    private String addAndConfirm(Task task) throws TaskSaveException {
         tasks.add(task);
         try {
             storage.save(tasks.asList());
@@ -79,16 +83,19 @@ public class GudGoi {
             tasks.removeLast();
             throw e;
         }
-        ui.show("Got it. I've added this task:\n  " + task
+        return "Got it. I've added this task:\n  " + task
                 + "\nNow you have " + tasks.size()
-                + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+                + (tasks.size() == 1 ? " task" : " tasks") + " in the list.";
     }
 
-    /** Prints every stored task, numbered from 1. */
-    private void listTasks() {
+    /**
+     * Lists every stored task, numbered from 1.
+     *
+     * @return the numbered agenda, or a note that it is empty.
+     */
+    private String listTasks() {
         if (tasks.isEmpty()) {
-            ui.show("Nothing on the agenda yet.");
-            return;
+            return "Nothing on the agenda yet.";
         }
 
         List<Task> allTasks = tasks.asList();
@@ -101,11 +108,11 @@ public class GudGoi {
                 list.append("\n");
             }
         }
-        ui.show(list.toString());
+        return list.toString();
     }
 
     /**
-     * Prints the tasks whose description holds the keyword.
+     * Finds the tasks whose description holds the keyword.
      * <p>
      * Each match keeps the number it has in the full agenda, not a number
      * counted from the first match. The user can therefore type
@@ -116,8 +123,9 @@ public class GudGoi {
      * remembers how they capitalized it.
      *
      * @param keyword the word to look for in the descriptions.
+     * @return the matching tasks, or a note that nothing matched.
      */
-    private void findTasks(String keyword) {
+    private String findTasks(String keyword) {
         String wanted = keyword.toLowerCase();
         List<Task> allTasks = tasks.asList();
 
@@ -135,22 +143,22 @@ public class GudGoi {
         }
 
         if (matches.length() == 0) {
-            ui.show("Nothing on the agenda matches \"" + keyword + "\".");
-            return;
+            return "Nothing on the agenda matches \"" + keyword + "\".";
         }
-        ui.show("Here are the matching tasks in your list:\n" + matches);
+        return "Here are the matching tasks in your list:\n" + matches;
     }
 
     /**
      * Marks the task the user named as done, then confirms it.
      *
      * @param number the text the user gave after {@code mark}.
+     * @return the words to show the user.
      * @throws GudGoiException if the text is not a number, no task sits at
      *                         that position, or the change cannot be saved. A
      *                         change that cannot be saved is undone first, so
      *                         the list still matches the file.
      */
-    private void mark(String number)
+    private String mark(String number)
             throws GudGoiException {
         Task task = tasks.get(Parser.parsePosition(number));
         // The task may already be done, so the undo restores what was there
@@ -165,19 +173,20 @@ public class GudGoi {
             }
             throw e;
         }
-        ui.show("Nice! I've marked this task as done:\n  " + task);
+        return "Nice! I've marked this task as done:\n  " + task;
     }
 
     /**
      * Marks the task the user named as not done, then confirms it.
      *
      * @param number the text the user gave after {@code unmark}.
+     * @return the words to show the user.
      * @throws GudGoiException if the text is not a number, no task sits at
      *                         that position, or the change cannot be saved. A
      *                         change that cannot be saved is undone first, so
      *                         the list still matches the file.
      */
-    private void unmark(String number)
+    private String unmark(String number)
             throws GudGoiException {
         Task task = tasks.get(Parser.parsePosition(number));
         boolean wasMarked = task.isMarked();
@@ -190,19 +199,20 @@ public class GudGoi {
             }
             throw e;
         }
-        ui.show("OK, I've marked this task as not done yet:\n  " + task);
+        return "OK, I've marked this task as not done yet:\n  " + task;
     }
 
     /**
      * Deletes the task the user named.
      *
      * @param number the text the user gave after {@code delete}.
+     * @return the words to show the user.
      * @throws GudGoiException if the text is not a number, no task sits at
      *                         that position, or the change cannot be saved. A
      *                         deletion that cannot be saved is undone, and the
      *                         task goes back where it was.
      */
-    private void deleteTask(String number)
+    private String deleteTask(String number)
             throws GudGoiException {
         int position = Parser.parsePosition(number);
         Task task = tasks.remove(position);
@@ -212,8 +222,8 @@ public class GudGoi {
             tasks.insert(position, task);
             throw e;
         }
-        ui.show("Noted. I've removed this task:\n  " + task
-                + "\nNow you have " + tasks.size() + " task(s) in the list.");
+        return "Noted. I've removed this task:\n  " + task
+                + "\nNow you have " + tasks.size() + " task(s) in the list.";
     }
 
     /**
@@ -222,17 +232,23 @@ public class GudGoi {
      * The loop in {@link #run()} reads lines; this method decides what a line
      * means and does it. Anything the user got wrong leaves here as a
      * {@link GudGoiException} for the caller to report.
+     * <p>
+     * It returns the answer rather than printing it, because the console and
+     * the window show the same words in different shapes. Every command in
+     * this program answers with text, so a command that has nothing to say is
+     * not a case that has to be handled.
      *
      * @param line one line the user typed, already trimmed.
+     * @return the words to show the user.
      * @throws GudGoiException if the command or its arguments are unusable.
      */
-    private void handle(String line) throws GudGoiException {
+    private String handle(String line) throws GudGoiException {
         String command = Parser.parseCommandWord(line);
         String rest = Parser.parseArguments(line);
 
         // Building the task is the Parser's answer to the command; storing it
         // and saying so is this class's.
-        switch (command) {
+        return switch (command) {
             case "list" -> listTasks();
             case "mark" -> mark(rest);
             case "unmark" -> unmark(rest);
@@ -242,7 +258,76 @@ public class GudGoi {
             case "delete" -> deleteTask(rest);
             case "find" -> findTasks(Parser.parseKeyword(rest));
             default -> throw new CommandNotFoundException();
+        };
+    }
+
+    /**
+     * Returns the words the bot opens with.
+     * <p>
+     * The console prints the greeting itself in {@link #run()}. The window has
+     * to put it in a bubble, so it asks for the text instead.
+     *
+     * @return the greeting.
+     */
+    public String getGreeting() {
+        return ui.getGreeting();
+    }
+
+    /**
+     * Restores the saved agenda, replacing whatever this bot held before.
+     * <p>
+     * A file that cannot be read costs the old agenda, not the session, so the
+     * trouble comes back as words rather than as an Exception. Both front ends
+     * call this after they have greeted the user, so that nobody is told about
+     * a save file by a bot that has not said hello.
+     *
+     * @return an empty string when the agenda was restored, or what went
+     *         wrong, in words the user can act on.
+     */
+    public String loadTasks() {
+        try {
+            tasks = new TaskList(storage.load());
+            return "";
+        } catch (TaskLoadException e) {
+            return e.getMessage();
         }
+    }
+
+    /**
+     * Answers one line of input, for a caller that shows the answer itself.
+     * <p>
+     * This is the whole of what the window needs. Unlike {@link #handle},
+     * nothing leaves here as an Exception: a command the user got wrong is an
+     * answer like any other, because the window has nowhere else to put it.
+     *
+     * @param input one line the user typed, trimmed here rather than by the
+     *              caller.
+     * @return the words to show the user, whether the command worked or not.
+     */
+    public String getResponse(String input) {
+        String line = input.trim();
+        if (isExit(line)) {
+            return ui.getFarewell();
+        }
+
+        try {
+            return handle(line);
+        } catch (GudGoiException e) {
+            return e.getMessage();
+        }
+    }
+
+    /**
+     * Tells whether a line ends the session.
+     * <p>
+     * The console breaks its loop on this; the window closes on it. Keeping
+     * the test here means the word {@code bye} is written down once.
+     *
+     * @param input one line the user typed.
+     * @return true when the user asked to leave.
+     */
+    public boolean isExit(String input) {
+        return input.trim().equals("bye");
     }
 
     /**
@@ -257,23 +342,22 @@ public class GudGoi {
         ui.showBanner();
         ui.showGreeting();
 
-        try {
-            tasks = new TaskList(storage.load());
-        } catch (TaskLoadException e) {
-            // A missing or damaged file costs the old agenda, not the session.
-            ui.showError(e.getMessage());
+        // A missing or damaged file costs the old agenda, not the session.
+        String loadTrouble = loadTasks();
+        if (!loadTrouble.isEmpty()) {
+            ui.showError(loadTrouble);
         }
 
         while (true) {
             // Ui.readCommand answers "bye" at the end of input, so this one test
             // ends the session whether the user typed bye or the input ran out.
             String line = ui.readCommand();
-            if (line.equals("bye")) {
+            if (isExit(line)) {
                 break;
             }
 
             try {
-                handle(line);
+                ui.show(handle(line));
             } catch (GudGoiException e) {
                 ui.showError(e.getMessage());
             }
