@@ -18,7 +18,7 @@ public class Todo extends Task {
     /**
      * Creates a todo that is not done yet.
      *
-     * @param description text the user entered
+     * @param description text the user entered.
      */
     public Todo(String description) {
         super(description);

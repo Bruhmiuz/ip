@@ -20,7 +20,7 @@ public class TaskNumberFormatException extends GudGoiException {
      * Creates the Exception for text that is not a usable task number,
      * choosing the wording that fits what the user actually typed.
      *
-     * @param text the text the user gave where a number was expected
+     * @param text the text the user gave where a number was expected.
      */
     public TaskNumberFormatException(String text) {
         super(describe(text));
@@ -29,8 +29,8 @@ public class TaskNumberFormatException extends GudGoiException {
     /**
      * Returns the message that fits this particular bad input.
      *
-     * @param text the text the user gave
-     * @return wording that names the real problem
+     * @param text the text the user gave.
+     * @return wording that names the real problem.
      */
     private static String describe(String text) {
         if (text.isEmpty()) {

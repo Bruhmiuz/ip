@@ -26,7 +26,7 @@ public class TaskLoadException extends GudGoiException {
      * Creates the Exception for a save file that could not be read.
      *
      * @param message what went wrong and what happened to the file, in words
-     *                the user can act on
+     *                the user can act on.
      */
     public TaskLoadException(String message) {
         super(message);

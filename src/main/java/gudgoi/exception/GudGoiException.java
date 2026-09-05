@@ -18,7 +18,7 @@ public class GudGoiException extends Exception {
     /**
      * Creates an Exception carrying a message meant for the user.
      *
-     * @param message what went wrong, in the bot's own words
+     * @param message what went wrong, in the bot's own words.
      */
     public GudGoiException(String message) {
         super(message);

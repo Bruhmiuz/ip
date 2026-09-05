@@ -53,7 +53,7 @@ public class Ui {
      * Every line of {@code body} is printed separately, so a multi-line
      * response such as the task list stays aligned.
      *
-     * @param body text to show, using {@code \n} to separate lines
+     * @param body text to show, using {@code \n} to separate lines.
      */
     public void show(String body) {
         System.out.println(DIVIDER);
@@ -70,7 +70,7 @@ public class Ui {
      * because the caller's intent is different, and because an error may later
      * want to look different without a hunt through every call site.
      *
-     * @param message what went wrong, in words the user can act on
+     * @param message what went wrong, in words the user can act on.
      */
     public void showError(String message) {
         show(message);
@@ -83,7 +83,7 @@ public class Ui {
      * there is nobody left to talk to. Handling it here means the rest of the
      * program never sees a null line.
      *
-     * @return the next command, or {@code "bye"} once input has ended
+     * @return the next command, or {@code "bye"} once input has ended.
      */
     public String readCommand() {
         String line = IO.readln();

@@ -44,7 +44,7 @@ public class TaskList {
      * The tasks are copied into a list of this class's own, so that whatever
      * {@link Storage} handed over cannot change underneath it later.
      *
-     * @param initial the tasks to start with, in order
+     * @param initial the tasks to start with, in order.
      */
     public TaskList(List<Task> initial) {
         this.tasks = new ArrayList<>(initial);
@@ -53,7 +53,7 @@ public class TaskList {
     /**
      * Returns how many tasks the agenda holds.
      *
-     * @return the number of tasks
+     * @return the number of tasks.
      */
     public int size() {
         return this.tasks.size();
@@ -62,7 +62,7 @@ public class TaskList {
     /**
      * Returns whether the agenda holds nothing.
      *
-     * @return true if there are no tasks
+     * @return true if there are no tasks.
      */
     public boolean isEmpty() {
         return this.tasks.isEmpty();
@@ -71,7 +71,7 @@ public class TaskList {
     /**
      * Adds a task to the end of the agenda.
      *
-     * @param task the task to add
+     * @param task the task to add.
      */
     public void add(Task task) {
         this.tasks.add(task);
@@ -80,9 +80,9 @@ public class TaskList {
     /**
      * Returns the task at the position the user named.
      *
-     * @param position the number the user typed, counting from 1
-     * @return the task sitting there
-     * @throws OutOfBoundException if no task sits at that position
+     * @param position the number the user typed, counting from 1.
+     * @return the task sitting there.
+     * @throws OutOfBoundException if no task sits at that position.
      */
     public Task get(int position) throws OutOfBoundException {
         checkPosition(position);
@@ -92,9 +92,9 @@ public class TaskList {
     /**
      * Takes the task at the position the user named out of the agenda.
      *
-     * @param position the number the user typed, counting from 1
-     * @return the task that was removed
-     * @throws OutOfBoundException if no task sits at that position
+     * @param position the number the user typed, counting from 1.
+     * @return the task that was removed.
+     * @throws OutOfBoundException if no task sits at that position.
      */
     public Task remove(int position) throws OutOfBoundException {
         checkPosition(position);
@@ -108,8 +108,8 @@ public class TaskList {
      * the agenda on screen still matches the file. It takes no position it has
      * not held before, so it does not check the bounds.
      *
-     * @param position where the task sat, counting from 1
-     * @param task the task to put back
+     * @param position where the task sat, counting from 1.
+     * @param task the task to put back.
      */
     public void insert(int position, Task task) {
         this.tasks.add(position - 1, task);
@@ -135,7 +135,7 @@ public class TaskList {
      * changes the agenda goes through the methods above, so this class stays
      * the only place that decides what the agenda holds.
      *
-     * @return the tasks in order, read-only
+     * @return the tasks in order, read-only.
      */
     public List<Task> asList() {
         return Collections.unmodifiableList(this.tasks);
@@ -144,8 +144,8 @@ public class TaskList {
     /**
      * Raises the Exception if the position names no task.
      *
-     * @param position the number the user typed, counting from 1
-     * @throws OutOfBoundException if no task sits there
+     * @param position the number the user typed, counting from 1.
+     * @throws OutOfBoundException if no task sits there.
      */
     private void checkPosition(int position) throws OutOfBoundException {
         if (position < 1 || position > this.tasks.size()) {

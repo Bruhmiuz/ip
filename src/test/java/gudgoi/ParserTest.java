@@ -38,24 +38,24 @@ public class ParserTest {
     // ---------- splitting the line ----------
 
     @Test
-    public void commandWord_lineWithArguments_returnsFirstWordOnly() {
-        assertEquals("deadline", Parser.commandWord("deadline read book /by 2019-10-15"));
+    public void parseCommandWord_lineWithArguments_returnsFirstWordOnly() {
+        assertEquals("deadline", Parser.parseCommandWord("deadline read book /by 2019-10-15"));
     }
 
     @Test
-    public void commandWord_oneWordLine_returnsThatWord() {
-        assertEquals("list", Parser.commandWord("list"));
+    public void parseCommandWord_oneWordLine_returnsThatWord() {
+        assertEquals("list", Parser.parseCommandWord("list"));
     }
 
     @Test
-    public void arguments_oneWordLine_returnsEmptyString() {
-        assertEquals("", Parser.arguments("list"));
+    public void parseArguments_oneWordLine_returnsEmptyString() {
+        assertEquals("", Parser.parseArguments("list"));
     }
 
     @Test
-    public void arguments_lineWithArguments_returnsEverythingAfterTheFirstWord() {
+    public void parseArguments_lineWithArguments_returnsEverythingAfterTheFirstWord() {
         assertEquals("read book /by 2019-10-15",
-                Parser.arguments("deadline read book /by 2019-10-15"));
+                Parser.parseArguments("deadline read book /by 2019-10-15"));
     }
 
     // ---------- todo ----------
@@ -99,39 +99,39 @@ public class ParserTest {
 
     @Test
     public void parseDeadline_leapDayInACommonYear_throwsDateFormatException() {
-        assertThrows(DateFormatException.class,
-                () -> Parser.parseDeadline("not a leap year /by 2019-02-29"));
+        assertThrows(DateFormatException.class, () ->
+                Parser.parseDeadline("not a leap year /by 2019-02-29"));
     }
 
     @Test
     public void parseDeadline_dayThatCannotExist_throwsDateFormatException() {
         // A lenient parser would quietly move this to the end of February.
-        assertThrows(DateFormatException.class,
-                () -> Parser.parseDeadline("impossible /by 2019-02-30"));
+        assertThrows(DateFormatException.class, () ->
+                Parser.parseDeadline("impossible /by 2019-02-30"));
     }
 
     @Test
     public void parseDeadline_dateWithoutLeadingZeros_throwsDateFormatException() {
-        assertThrows(DateFormatException.class,
-                () -> Parser.parseDeadline("short /by 2019-1-5"));
+        assertThrows(DateFormatException.class, () ->
+                Parser.parseDeadline("short /by 2019-1-5"));
     }
 
     @Test
     public void parseDeadline_timeOutsideTheClock_throwsDateFormatException() {
-        assertThrows(DateFormatException.class,
-                () -> Parser.parseDeadline("late /by 2019-10-15 2500"));
+        assertThrows(DateFormatException.class, () ->
+                Parser.parseDeadline("late /by 2019-10-15 2500"));
     }
 
     @Test
     public void parseDeadline_noByPart_throwsDeadlineFormatException() {
-        assertThrows(DeadlineFormatException.class,
-                () -> Parser.parseDeadline("read book"));
+        assertThrows(DeadlineFormatException.class, () ->
+                Parser.parseDeadline("read book"));
     }
 
     @Test
     public void parseDeadline_byPartEmpty_throwsDeadlineFormatException() {
-        assertThrows(DeadlineFormatException.class,
-                () -> Parser.parseDeadline("read book /by    "));
+        assertThrows(DeadlineFormatException.class, () ->
+                Parser.parseDeadline("read book /by    "));
     }
 
     // ---------- event ----------
@@ -151,28 +151,28 @@ public class ParserTest {
 
     @Test
     public void parseEvent_endBeforeStart_throwsEventFormatException() {
-        assertThrows(EventFormatException.class,
-                () -> Parser.parseEvent("backwards /from 2019-10-15 1600 /to 2019-10-15 1400"));
+        assertThrows(EventFormatException.class, () ->
+                Parser.parseEvent("backwards /from 2019-10-15 1600 /to 2019-10-15 1400"));
     }
 
     @Test
     public void parseEvent_endDayBeforeStartDay_throwsEventFormatException() {
         // Both are dates alone, so the defaults decide: the 17th starts at
         // midnight and the 15th ends at 23:59, which is still backwards.
-        assertThrows(EventFormatException.class,
-                () -> Parser.parseEvent("backwards /from 2019-10-17 /to 2019-10-15"));
+        assertThrows(EventFormatException.class, () ->
+                Parser.parseEvent("backwards /from 2019-10-17 /to 2019-10-15"));
     }
 
     @Test
     public void parseEvent_toBeforeFrom_throwsEventFormatException() {
-        assertThrows(EventFormatException.class,
-                () -> Parser.parseEvent("party /to 2019-10-15 /from 2019-10-14"));
+        assertThrows(EventFormatException.class, () ->
+                Parser.parseEvent("party /to 2019-10-15 /from 2019-10-14"));
     }
 
     @Test
     public void parseEvent_noToPart_throwsEventFormatException() {
-        assertThrows(EventFormatException.class,
-                () -> Parser.parseEvent("meeting /from 2019-10-15"));
+        assertThrows(EventFormatException.class, () ->
+                Parser.parseEvent("meeting /from 2019-10-15"));
     }
 
     // ---------- find ----------
@@ -223,8 +223,8 @@ public class ParserTest {
 
     @Test
     public void parsePosition_tooBigForAnInt_throwsTaskNumberFormatException() {
-        assertThrows(TaskNumberFormatException.class,
-                () -> Parser.parsePosition("99999999999"));
+        assertThrows(TaskNumberFormatException.class, () ->
+                Parser.parsePosition("99999999999"));
     }
 
     @Test

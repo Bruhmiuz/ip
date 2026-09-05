@@ -36,9 +36,9 @@ public class Event extends Task {
     /**
      * Creates an event that is not done yet.
      *
-     * @param description text the user entered
-     * @param from when the event starts
-     * @param to when the event ends
+     * @param description text the user entered.
+     * @param from when the event starts.
+     * @param to when the event ends.
      */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
@@ -49,7 +49,7 @@ public class Event extends Task {
     /**
      * Returns when this event starts.
      *
-     * @return the start time
+     * @return the start time.
      */
     public LocalDateTime getFrom() {
         return this.from;
@@ -58,7 +58,7 @@ public class Event extends Task {
     /**
      * Returns when this event ends.
      *
-     * @return the end time
+     * @return the end time.
      */
     public LocalDateTime getTo() {
         return this.to;

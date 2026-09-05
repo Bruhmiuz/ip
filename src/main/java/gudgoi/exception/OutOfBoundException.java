@@ -17,8 +17,8 @@ public class OutOfBoundException extends GudGoiException {
     /**
      * Creates the Exception for a number that points outside the list.
      *
-     * @param index the position the user asked for, counting from 1
-     * @param size how many tasks the list actually holds
+     * @param index the position the user asked for, counting from 1.
+     * @param size how many tasks the list actually holds.
      */
     public OutOfBoundException(int index, int size) {
         super(describe(index, size));
@@ -27,9 +27,9 @@ public class OutOfBoundException extends GudGoiException {
     /**
      * Returns the message that fits this particular position.
      *
-     * @param index the position the user asked for
-     * @param size how many tasks the list holds
-     * @return wording that says what went wrong and what is available
+     * @param index the position the user asked for.
+     * @param size how many tasks the list holds.
+     * @return wording that says what went wrong and what is available.
      */
     private static String describe(int index, int size) {
         if (size == 0) {

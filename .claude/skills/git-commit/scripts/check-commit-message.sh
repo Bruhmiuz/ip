@@ -14,6 +14,22 @@ if [ "$#" -ne 1 ]; then
     exit 2
 fi
 
+# Some checks below use grep -P, which refuses to run in a locale it cannot
+# classify as unibyte or UTF-8. An unset locale, which is what Git Bash on
+# Windows gives, is one of those, and those checks then fail quietly. Pick a
+# UTF-8 locale that exists here, and say so plainly when none does.
+for candidate in "$LC_ALL" C.UTF-8 en_US.UTF-8; do
+    [ -z "$candidate" ] && continue
+    if LC_ALL="$candidate" grep -qP 'a' <<< 'a' 2>/dev/null; then
+        export LC_ALL="$candidate"
+        break
+    fi
+done
+if ! grep -qP 'a' <<< 'a' 2>/dev/null; then
+    echo "warning: grep -P does not work in this locale, so some checks below" >&2
+    echo "         cannot run. Treat a clean result as incomplete." >&2
+fi
+
 if [ "$1" = "-" ]; then
     msg=$(cat)
 else

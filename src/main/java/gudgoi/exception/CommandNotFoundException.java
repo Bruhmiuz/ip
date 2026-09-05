@@ -9,7 +9,7 @@ package gudgoi.exception;
 
 /** The first word of the input is not a command the bot knows. */
 public class CommandNotFoundException extends GudGoiException {
-    /** Creates the Exception for an unrecognised command. */
+    /** Creates the Exception for an unrecognized command. */
     public CommandNotFoundException() {
         super("OOPS!!! I'm sorry, but I don't know what that means :-(");
     }

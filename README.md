@@ -7,6 +7,21 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Apply the peer review feedback and set up Checkstyle
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+3 and 4 September 2026, from the review comments on my pull request and from my
+decision that `Task` should be abstract. The renames, the Javadoc periods, the
+American spellings and the Checkstyle reindentation are edits to code that
+already existed; the files below are the ones that received newly written code.
+
+* `src/main/java/gudgoi/GudGoi.java` — the rewritten command loop in `run`
+* `src/main/java/gudgoi/task/Task.java` — the header comment on the constructor,
+  now `protected`
+* `.claude/skills/git-commit/scripts/check-conventions.sh` — the locale guard,
+  and the three new checks for Javadoc periods, British spelling and boolean
+  names
+
 #### Add a find command
 
 Claude (Anthropic), used through Claude Code, generated the code below on

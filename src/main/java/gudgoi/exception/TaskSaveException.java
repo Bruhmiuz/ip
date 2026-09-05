@@ -23,7 +23,7 @@ public class TaskSaveException extends GudGoiException {
      * Creates the Exception for a failed write.
      *
      * @param reason what the file system reported, usually the path it could
-     *               not write
+     *               not write.
      */
     public TaskSaveException(String reason) {
         super("OOPS!!! I could not save that change: " + reason

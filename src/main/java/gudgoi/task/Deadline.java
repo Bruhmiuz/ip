@@ -29,8 +29,8 @@ public class Deadline extends Task {
     /**
      * Creates a deadline that is not done yet.
      *
-     * @param description text the user entered
-     * @param by when the task is due
+     * @param description text the user entered.
+     * @param by when the task is due.
      */
     public Deadline(String description, LocalDateTime by) {
         super(description);
@@ -40,7 +40,7 @@ public class Deadline extends Task {
     /**
      * Returns when this task is due.
      *
-     * @return the due time
+     * @return the due time.
      */
     public LocalDateTime getBy() {
         return this.by;

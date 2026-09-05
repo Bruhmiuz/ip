@@ -72,20 +72,20 @@ public class Parser {
     /**
      * Returns the first word of the line: the command the user is asking for.
      *
-     * @param line one line the user typed, already trimmed
-     * @return the command word, or the whole line when it holds one word
+     * @param line one line the user typed, already trimmed.
+     * @return the command word, or the whole line when it holds one word.
      */
-    public static String commandWord(String line) {
+    public static String parseCommandWord(String line) {
         return line.split(" ", 2)[0];
     }
 
     /**
      * Returns everything after the command word.
      *
-     * @param line one line the user typed, already trimmed
-     * @return the rest of the line, or an empty string when there is no rest
+     * @param line one line the user typed, already trimmed.
+     * @return the rest of the line, or an empty string when there is no rest.
      */
-    public static String arguments(String line) {
+    public static String parseArguments(String line) {
         String[] parts = line.split(" ", 2);
         return parts.length > 1 ? parts[1] : "";
     }
@@ -98,9 +98,9 @@ public class Parser {
      * knows how long it is.
      *
      * @param number the text after {@code mark}, {@code unmark} or
-     *               {@code delete}
-     * @return the position, counting from 1, unchecked against any list
-     * @throws TaskNumberFormatException if the text is not a readable number
+     *               {@code delete}.
+     * @return the position, counting from 1, unchecked against any list.
+     * @throws TaskNumberFormatException if the text is not a readable number.
      */
     public static int parsePosition(String number)
             throws TaskNumberFormatException {
@@ -115,9 +115,9 @@ public class Parser {
     /**
      * Reads the word a {@code find} command is to search for.
      *
-     * @param details the command text after {@code find}
-     * @return the keyword, with surrounding blanks removed
-     * @throws FindFormatException if nothing was given to search for
+     * @param details the command text after {@code find}.
+     * @return the keyword, with surrounding blanks removed.
+     * @throws FindFormatException if nothing was given to search for.
      */
     public static String parseKeyword(String details) throws FindFormatException {
         String keyword = details.trim();
@@ -130,9 +130,9 @@ public class Parser {
     /**
      * Builds a todo from the rest of a {@code todo} command.
      *
-     * @param details the command text after {@code todo}, the description
-     * @return the todo the user described
-     * @throws TodoFormatException if no description was given
+     * @param details the command text after {@code todo}, the description.
+     * @return the todo the user described.
+     * @throws TodoFormatException if no description was given.
      */
     public static Todo parseTodo(String details) throws TodoFormatException {
         String description = details.trim();
@@ -146,10 +146,10 @@ public class Parser {
      * Builds a deadline from the rest of a {@code deadline} command.
      *
      * @param details the command text after {@code deadline}, in the form
-     *                {@code description /by when}
-     * @return the deadline the user described
-     * @throws DeadlineFormatException if the description or the /by part is missing
-     * @throws DateFormatException if the /by part is not a date
+     *                {@code description /by when}.
+     * @return the deadline the user described.
+     * @throws DeadlineFormatException if the description or the /by part is missing.
+     * @throws DateFormatException if the /by part is not a date.
      */
     public static Deadline parseDeadline(String details)
             throws DeadlineFormatException, DateFormatException {
@@ -170,11 +170,11 @@ public class Parser {
      * Builds an event from the rest of an {@code event} command.
      *
      * @param details the command text after {@code event}, in the form
-     *                {@code description /from start /to end}
-     * @return the event the user described
+     *                {@code description /from start /to end}.
+     * @return the event the user described.
      * @throws EventFormatException if a part is missing, or the end falls
-     *                              before the start
-     * @throws DateFormatException if the /from or /to part is not a date
+     *                              before the start.
+     * @throws DateFormatException if the /from or /to part is not a date.
      */
     public static Event parseEvent(String details)
             throws EventFormatException, DateFormatException {
@@ -216,10 +216,10 @@ public class Parser {
      * a day it wants.
      *
      * @param text what the user wrote after {@code /by}, {@code /from} or
-     *             {@code /to}
-     * @param defaultTime the time to use when the text carries none
-     * @return the point in time the text names
-     * @throws DateFormatException if the text is neither pattern
+     *             {@code /to}.
+     * @param defaultTime the time to use when the text carries none.
+     * @return the point in time the text names.
+     * @throws DateFormatException if the text is neither pattern.
      */
     private static LocalDateTime parseDateTime(String text, LocalTime defaultTime)
             throws DateFormatException {

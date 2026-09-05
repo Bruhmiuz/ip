@@ -45,7 +45,7 @@ public class Storage {
      * with a slash in it does not.
      *
      * @param file where the agenda is kept, relative to the folder the program
-     *             runs in
+     *             runs in.
      */
     public Storage(Path file) {
         this.file = file;
@@ -58,8 +58,8 @@ public class Storage {
      * can be a deletion or a mark as easily as an addition. The list is small,
      * so the simpler approach costs nothing worth measuring.
      *
-     * @param tasks the list to store, in the order it is to be read back
-     * @throws TaskSaveException if the file or its folder cannot be written
+     * @param tasks the list to store, in the order it is to be read back.
+     * @throws TaskSaveException if the file or its folder cannot be written.
      */
     public void save(List<Task> tasks) throws TaskSaveException {
         try {
@@ -86,9 +86,9 @@ public class Storage {
      * an agenda read out of a damaged file is worse than no agenda, because the
      * user cannot see what is missing. Such a file is deleted.
      *
-     * @return the tasks the file holds, in the order it holds them
+     * @return the tasks the file holds, in the order it holds them.
      * @throws TaskLoadException if the file cannot be read or does not match
-     *                           the format
+     *                           the format.
      */
     public List<Task> load() throws TaskLoadException {
         List<Task> loaded = new ArrayList<>();
@@ -128,8 +128,8 @@ public class Storage {
      * as {@code throw discardCorruptFile(line)}. The reader can then see that
      * the loop stops there.
      *
-     * @param badLine the first line that could not be read
-     * @return the Exception the caller is to raise
+     * @param badLine the first line that could not be read.
+     * @return the Exception the caller is to raise.
      */
     private TaskLoadException discardCorruptFile(String badLine) {
         String problem = "Your save file does not match the format I write."
@@ -157,9 +157,9 @@ public class Storage {
      * decides which class to build. That is why this factory sits here while
      * {@link Task#toSaveFormat()} sits on the task.
      *
-     * @param line one line of the save file
+     * @param line one line of the save file.
      * @return the task the line describes, or {@code null} if the line cannot
-     *         be read
+     *         be read.
      */
     private static Task parseSavedTask(String line) {
         // A separator is a | that no backslash protects. The lookbehind is what
@@ -181,13 +181,13 @@ public class Storage {
         String description = unescape(fields[2]);
         try {
             Task task = switch (fields[0]) {
-            case "T" -> fields.length != 3 ? null : new Todo(description);
-            case "D" -> fields.length != 4 ? null
-                    : new Deadline(description, LocalDateTime.parse(fields[3]));
-            case "E" -> fields.length != 5 ? null
-                    : new Event(description, LocalDateTime.parse(fields[3]),
-                    LocalDateTime.parse(fields[4]));
-            default -> null;
+                case "T" -> fields.length != 3 ? null : new Todo(description);
+                case "D" -> fields.length != 4 ? null
+                        : new Deadline(description, LocalDateTime.parse(fields[3]));
+                case "E" -> fields.length != 5 ? null
+                        : new Event(description, LocalDateTime.parse(fields[3]),
+                        LocalDateTime.parse(fields[4]));
+                default -> null;
             };
 
             if (task != null && fields[1].equals("1")) {
@@ -205,8 +205,8 @@ public class Storage {
      * Returns the original text of a field read from the save file, undoing
      * {@link Task#escape(String)}.
      *
-     * @param field one field of a save-file line, as it was stored
-     * @return the text the user typed
+     * @param field one field of a save-file line, as it was stored.
+     * @return the text the user typed.
      */
     private static String unescape(String field) {
         return field.replace("\\|", "|");

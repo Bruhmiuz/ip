@@ -31,10 +31,10 @@ public class EventFormatException extends GudGoiException {
      * Creates the Exception for an event whose end falls before its start.
      * <p>
      * Both times are shown, because the user gave one of them as a date alone
-     * and may not realise which end of the day it became.
+     * and may not realize which end of the day it became.
      *
-     * @param from when the event was said to start
-     * @param to when the event was said to end
+     * @param from when the event was said to start.
+     * @param to when the event was said to end.
      */
     public EventFormatException(LocalDateTime from, LocalDateTime to) {
         super("OOPS!!! That event ends before it starts."

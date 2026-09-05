@@ -13,7 +13,7 @@ public class DateFormatException extends GudGoiException {
     /**
      * Creates the Exception for text that could not be read as a date.
      *
-     * @param text what the user wrote where a date was expected
+     * @param text what the user wrote where a date was expected.
      */
     public DateFormatException(String text) {
         super("OOPS!!! I could not read \"" + text + "\" as a date."

@@ -29,6 +29,8 @@ public class GudGoi {
     // the command reading were generated the same way and have since moved to
     // Ui, Storage, TaskList and Parser. I reviewed the code before committing
     // it, and rewrote parts of it myself.
+    // The command loop in run was rewritten the same way on 2026-09-03, after a
+    // peer review asked for the assignment to come out of the while condition.
     // ---------------------------------------------------------------------
 
     /** The one way in and out for anything the user sees or types. */
@@ -53,7 +55,7 @@ public class GudGoi {
      * anything about a file, and so that building a bot cannot fail.
      *
      * @param savePath where the agenda is kept, relative to the folder the
-     *                 program runs in
+     *                 program runs in.
      */
     public GudGoi(Path savePath) {
         this.ui = new Ui();
@@ -65,9 +67,9 @@ public class GudGoi {
      * Stores a task and prints the confirmation shared by all three add
      * commands, including the running total.
      *
-     * @param task the task that was just built
+     * @param task the task that was just built.
      * @throws TaskSaveException if the new list cannot be written, in which
-     *                           case the task is taken out again
+     *                           case the task is taken out again.
      */
     private void addAndConfirm(Task task) throws TaskSaveException {
         tasks.add(task);
@@ -89,13 +91,13 @@ public class GudGoi {
             return;
         }
 
-        List<Task> all = tasks.asList();
+        List<Task> allTasks = tasks.asList();
         StringBuilder list = new StringBuilder();
-        for (int i = 0; i < all.size(); i++) {
+        for (int i = 0; i < allTasks.size(); i++) {
             // Tasks are numbered from 1 for the user, but indexed from 0 here.
             // Task.toString() supplies the "[X] " or "[ ] " status box.
-            list.append(i + 1).append(".").append(all.get(i));
-            if (i < all.size() - 1) {
+            list.append(i + 1).append(".").append(allTasks.get(i));
+            if (i < allTasks.size() - 1) {
                 list.append("\n");
             }
         }
@@ -111,17 +113,17 @@ public class GudGoi {
      * again to find out what 4 means.
      * <p>
      * The search ignores case, because a person looking for a word rarely
-     * remembers how they capitalised it.
+     * remembers how they capitalized it.
      *
-     * @param keyword the word to look for in the descriptions
+     * @param keyword the word to look for in the descriptions.
      */
     private void findTasks(String keyword) {
         String wanted = keyword.toLowerCase();
-        List<Task> all = tasks.asList();
+        List<Task> allTasks = tasks.asList();
 
         StringBuilder matches = new StringBuilder();
-        for (int i = 0; i < all.size(); i++) {
-            Task task = all.get(i);
+        for (int i = 0; i < allTasks.size(); i++) {
+            Task task = allTasks.get(i);
             if (!task.getDescription().toLowerCase().contains(wanted)) {
                 continue;
             }
@@ -142,7 +144,7 @@ public class GudGoi {
     /**
      * Marks the task the user named as done, then confirms it.
      *
-     * @param number the text the user gave after {@code mark}
+     * @param number the text the user gave after {@code mark}.
      * @throws GudGoiException if the text is not a number, no task sits at
      *                         that position, or the change cannot be saved. A
      *                         change that cannot be saved is undone first, so
@@ -169,7 +171,7 @@ public class GudGoi {
     /**
      * Marks the task the user named as not done, then confirms it.
      *
-     * @param number the text the user gave after {@code unmark}
+     * @param number the text the user gave after {@code unmark}.
      * @throws GudGoiException if the text is not a number, no task sits at
      *                         that position, or the change cannot be saved. A
      *                         change that cannot be saved is undone first, so
@@ -194,7 +196,7 @@ public class GudGoi {
     /**
      * Deletes the task the user named.
      *
-     * @param number the text the user gave after {@code delete}
+     * @param number the text the user gave after {@code delete}.
      * @throws GudGoiException if the text is not a number, no task sits at
      *                         that position, or the change cannot be saved. A
      *                         deletion that cannot be saved is undone, and the
@@ -221,25 +223,25 @@ public class GudGoi {
      * means and does it. Anything the user got wrong leaves here as a
      * {@link GudGoiException} for the caller to report.
      *
-     * @param line one line the user typed, already trimmed
-     * @throws GudGoiException if the command or its arguments are unusable
+     * @param line one line the user typed, already trimmed.
+     * @throws GudGoiException if the command or its arguments are unusable.
      */
     private void handle(String line) throws GudGoiException {
-        String command = Parser.commandWord(line);
-        String rest = Parser.arguments(line);
+        String command = Parser.parseCommandWord(line);
+        String rest = Parser.parseArguments(line);
 
         // Building the task is the Parser's answer to the command; storing it
         // and saying so is this class's.
         switch (command) {
-        case "list" -> listTasks();
-        case "mark" -> mark(rest);
-        case "unmark" -> unmark(rest);
-        case "todo" -> addAndConfirm(Parser.parseTodo(rest));
-        case "deadline" -> addAndConfirm(Parser.parseDeadline(rest));
-        case "event" -> addAndConfirm(Parser.parseEvent(rest));
-        case "delete" -> deleteTask(rest);
-        case "find" -> findTasks(Parser.parseKeyword(rest));
-        default -> throw new CommandNotFoundException();
+            case "list" -> listTasks();
+            case "mark" -> mark(rest);
+            case "unmark" -> unmark(rest);
+            case "todo" -> addAndConfirm(Parser.parseTodo(rest));
+            case "deadline" -> addAndConfirm(Parser.parseDeadline(rest));
+            case "event" -> addAndConfirm(Parser.parseEvent(rest));
+            case "delete" -> deleteTask(rest);
+            case "find" -> findTasks(Parser.parseKeyword(rest));
+            default -> throw new CommandNotFoundException();
         }
     }
 
@@ -262,8 +264,14 @@ public class GudGoi {
             ui.showError(e.getMessage());
         }
 
-        String line;
-        while (!(line = ui.readCommand()).equals("bye")) {
+        while (true) {
+            // Ui.readCommand answers "bye" at the end of input, so this one test
+            // ends the session whether the user typed bye or the input ran out.
+            String line = ui.readCommand();
+            if (line.equals("bye")) {
+                break;
+            }
+
             try {
                 handle(line);
             } catch (GudGoiException e) {
@@ -280,7 +288,7 @@ public class GudGoi {
      * {@link Path#of} joins the parts with the separator the host system uses,
      * so this one line works on Windows and on Linux without a change.
      *
-     * @param args ignored; the bot takes no command line arguments
+     * @param args ignored; the bot takes no command line arguments.
      */
     public static void main(String[] args) {
         new GudGoi(Path.of("data", "saved.txt")).run();
