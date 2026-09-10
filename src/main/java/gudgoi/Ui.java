@@ -10,9 +10,13 @@
 // The change of show to a variable arity method was generated the same way
 // on 2026-09-05, from my decision that a caller should be able to hand over
 // a response line by line instead of joining it first.
+// The stream in show was generated the same way on 2026-09-10, for
+// A-Streams.
 // ---------------------------------------------------------------------
 
 package gudgoi;
+
+import java.util.Arrays;
 
 /**
  * Everything the bot says to the console, and everything it hears back.
@@ -99,11 +103,13 @@ public class Ui {
      */
     public void show(String... parts) {
         System.out.println(DIVIDER);
-        for (String part : parts) {
-            for (String line : part.split("\n")) {
-                System.out.println(line);
-            }
-        }
+        // flatMap is what turns "some parts, each holding some lines" into
+        // one run of lines. split keeps the old behavior exactly: an empty
+        // part still prints one blank line, where String.lines() would print
+        // nothing.
+        Arrays.stream(parts)
+                .flatMap(part -> Arrays.stream(part.split("\n")))
+                .forEach(System.out::println);
         System.out.println(DIVIDER + "\n");
     }
 
