@@ -7,6 +7,16 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Guard a save path that has no folder
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+10 September 2026, from my decision to fix this after the three week 5 pull
+requests were merged rather than inside the A-CodeQuality one.
+
+* `src/main/java/gudgoi/Storage.java` — the null check on the parent folder in
+  `save`
+* `src/test/java/gudgoi/StorageTest.java` — `save_pathWithNoFolder_doesNotFail`
+
 #### Add trivia cards
 
 Claude (Anthropic), used through Claude Code, generated the code below on

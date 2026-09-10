@@ -167,4 +167,20 @@ public class StorageTest {
         new Storage(nested).save(List.of(new Todo("read book")));
         assertTrue(Files.exists(nested));
     }
+
+    @Test
+    public void save_pathWithNoFolder_doesNotFail() throws Exception {
+        // Path.getParent() is null for a bare filename, and save used to hand
+        // that null straight to Files.createDirectories. A path with no folder
+        // is relative to the working directory by definition, so this is the
+        // one test that cannot use the TempDir folder. It cleans up after
+        // itself instead.
+        Path bare = Path.of("storage-test-no-folder.txt");
+        try {
+            new Storage(bare).save(List.of(new Todo("read book")));
+            assertTrue(Files.exists(bare));
+        } finally {
+            Files.deleteIfExists(bare);
+        }
+    }
 }

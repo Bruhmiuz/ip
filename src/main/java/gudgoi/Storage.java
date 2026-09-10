@@ -6,9 +6,12 @@
 // the constructor and the change from printing to raising an Exception were
 // generated. I reviewed the code before committing it.
 // The save-file layout constants, and the split of parseSavedTask into
-// hasReadableShape, buildTask and timeAt, were generated the same way on
-// 2026-09-10, for A-CodeQuality.
+// hasReadableShape, buildTask, buildTodo, buildDeadline, buildEvent,
+// descriptionOf and timeAt, were generated the same way on 2026-09-10, for
+// A-CodeQuality.
 // The stream in save was generated the same way on 2026-09-10, for A-Streams.
+// The guard on a save path with no folder was generated the same way on
+// 2026-09-10.
 // ---------------------------------------------------------------------
 
 package gudgoi;
@@ -100,7 +103,15 @@ public class Storage {
      */
     public void save(List<Task> tasks) throws TaskSaveException {
         try {
-            Files.createDirectories(this.file.getParent());
+            // getParent returns null for a bare filename such as "saved.txt",
+            // which has no folder to create. A caller may legitimately pass
+            // one, so this is a real check rather than an assertion: an
+            // assertion would be absent from the shipped JAR, where the
+            // NullPointerException would still be waiting.
+            Path parent = this.file.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
 
             // Each task already knows how to write itself, so the whole file
             // is that one method applied down the list.
