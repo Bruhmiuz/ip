@@ -18,6 +18,22 @@ codebase a stream actually makes clearer.
 * `src/main/java/gudgoi/Storage.java` — the stream in `save`
 * `src/main/java/gudgoi/Ui.java` — the stream in `show`
 
+#### Add assertions
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+10 September 2026, for A-Assertions, from my decision about which assumptions
+in the save-and-undo protocol are the program's own rather than the user's.
+
+* `src/main/java/gudgoi/GudGoi.java` — the assertions in `addAndConfirm`,
+  `mark`, `unmark` and `deleteTask` that check each undo path
+* `src/main/java/gudgoi/TaskList.java` — the assertions in `insert` and
+  `removeLast`, and the Javadoc that explains them
+* `src/main/java/gudgoi/Parser.java` — the assertions in `parseCommandWord`
+  and `parseArguments` that the line arrives trimmed
+* `src/test/java/gudgoi/TaskListTest.java` —
+  `removeLast_onAnEmptyList_failsTheAssertion`
+* `build.gradle` — `enableAssertions` on the `test` and `run` tasks
+
 #### Let Ui.show take a line for each argument
 
 Claude (Anthropic), used through Claude Code, generated the code below on
