@@ -7,6 +7,29 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Add trivia cards
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+10 September 2026, for the D-Trivia extension, from my decisions that a card is
+its own kind of thing rather than a fourth kind of task, that the deck lives in
+its own file, and that a quiz asks one question and grades the next line typed.
+
+* `src/main/java/gudgoi/trivia/Card.java` — whole file
+* `src/main/java/gudgoi/trivia/CardList.java` — whole file
+* `src/main/java/gudgoi/trivia/CardStorage.java` — whole file
+* `src/main/java/gudgoi/exception/CardFormatException.java` — whole file
+* `src/main/java/gudgoi/exception/CardSaveException.java` — whole file
+* `src/main/java/gudgoi/exception/CardLoadException.java` — whole file
+* `src/test/java/gudgoi/trivia/CardTest.java` — whole file
+* `src/test/java/gudgoi/trivia/CardListTest.java` — whole file
+* `src/test/java/gudgoi/trivia/CardStorageTest.java` — whole file
+* `src/main/java/gudgoi/GudGoi.java` — `addCard`, `listCards`, `deleteCard`,
+  `startQuiz`, `gradeAnswer`, `loadCards`, and the card fields and dispatch
+* `src/main/java/gudgoi/Parser.java` — `parseCard`
+* `src/main/java/gudgoi/exception/OutOfBoundException.java` — the `noun`
+  parameter, so a deck reports a bad position in its own words
+* `src/main/java/gudgoi/gui/MainWindow.java` — `CARD_PATH` and the deck restore
+
 #### Use streams
 
 Claude (Anthropic), used through Claude Code, generated the code below on

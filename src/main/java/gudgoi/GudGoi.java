@@ -6,11 +6,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import gudgoi.exception.CardSaveException;
 import gudgoi.exception.CommandNotFoundException;
 import gudgoi.exception.GudGoiException;
 import gudgoi.exception.TaskLoadException;
 import gudgoi.exception.TaskSaveException;
 import gudgoi.task.Task;
+import gudgoi.trivia.Card;
+import gudgoi.trivia.CardList;
+import gudgoi.trivia.CardStorage;
 
 /**
  * The chatbot itself: one bot, holding the four parts and deciding the order
@@ -60,6 +64,23 @@ public class GudGoi {
      */
     private TaskList tasks;
 
+    /** The deck on disk. */
+    private final CardStorage cardStorage;
+
+    /** The deck in memory. Replaced, not filled, once storage is read. */
+    private CardList cards;
+
+    /**
+     * The card the user has been asked and has not yet answered, or
+     * {@code null} when no question is waiting.
+     * <p>
+     * This is the only state the bot keeps between one command and the next.
+     * It lasts exactly one line: {@code quiz} sets it, the next input clears
+     * it. Keeping it that short is what stops every other command having to
+     * decide what it means in the middle of a quiz.
+     */
+    private Card pendingCard;
+
     /**
      * Builds a bot that keeps its agenda in one file.
      * <p>
@@ -69,11 +90,15 @@ public class GudGoi {
      *
      * @param savePath where the agenda is kept, relative to the folder the
      *                 program runs in.
+     * @param cardPath where the trivia deck is kept, in its own file so that
+     *                 damage to one cannot cost the other.
      */
-    public GudGoi(Path savePath) {
+    public GudGoi(Path savePath, Path cardPath) {
         this.ui = new Ui();
         this.storage = new Storage(savePath);
         this.tasks = new TaskList();
+        this.cardStorage = new CardStorage(cardPath);
+        this.cards = new CardList();
     }
 
     /**
@@ -284,6 +309,13 @@ public class GudGoi {
      * @throws GudGoiException if the command or its arguments are unusable.
      */
     private String handle(String line) throws GudGoiException {
+        // A question that is waiting takes the whole line, whatever it says.
+        // The exit word is tested by the caller before this, so "bye" still
+        // ends the session rather than being graded as a wrong answer.
+        if (pendingCard != null) {
+            return gradeAnswer(line);
+        }
+
         String command = Parser.parseCommandWord(line);
         String rest = Parser.parseArguments(line);
 
@@ -298,9 +330,128 @@ public class GudGoi {
             case "event" -> addAndConfirm(Parser.parseEvent(rest));
             case "delete" -> deleteTask(rest);
             case "find" -> findTasks(Parser.parseKeyword(rest));
+            case "card" -> addCard(Parser.parseCard(rest));
+            case "cards" -> listCards();
+            case "deletecard" -> deleteCard(rest);
+            case "quiz" -> startQuiz();
             default -> throw new CommandNotFoundException();
         };
     }
+
+    /**
+     * Stores a card and confirms it.
+     *
+     * @param card the card the user described.
+     * @return the words to show the user.
+     * @throws CardSaveException if the deck cannot be written, in which case
+     *                           the card is taken out again.
+     */
+    private String addCard(Card card) throws CardSaveException {
+        cards.add(card);
+        try {
+            cardStorage.save(cards.asList());
+        } catch (CardSaveException e) {
+            cards.removeLast();
+            throw e;
+        }
+        return "Added this card:\n  " + card + "\nYou now have " + cards.size()
+                + (cards.size() == 1 ? " card" : " cards") + " to learn.";
+    }
+
+    /**
+     * Lists every card, numbered from 1, with its answer shown.
+     *
+     * @return the numbered deck, or a note that it is empty.
+     */
+    private String listCards() {
+        if (cards.isEmpty()) {
+            return "No cards yet. Add one with: card <question> /a <answer>";
+        }
+
+        List<Card> allCards = cards.asList();
+        String numbered = IntStream.range(0, allCards.size())
+                .mapToObj(position -> (position + 1) + "." + allCards.get(position))
+                .collect(Collectors.joining("\n"));
+        return "Here are your cards:\n" + numbered;
+    }
+
+    /**
+     * Deletes the card the user named.
+     *
+     * @param number the text the user gave after {@code deletecard}.
+     * @return the words to show the user.
+     * @throws GudGoiException if the text is not a number, no card sits at that
+     *                         position, or the change cannot be saved. A delete
+     *                         that cannot be saved is undone.
+     */
+    private String deleteCard(String number) throws GudGoiException {
+        int position = Parser.parsePosition(number);
+        Card card = cards.remove(position);
+        try {
+            cardStorage.save(cards.asList());
+        } catch (CardSaveException e) {
+            cards.insert(position, card);
+            throw e;
+        }
+        return "Dropped this card:\n  " + card;
+    }
+
+    /**
+     * Asks one card, chosen at random, and remembers it until the next line.
+     *
+     * @return the question, or a note that there is nothing to be asked.
+     */
+    private String startQuiz() {
+        if (cards.isEmpty()) {
+            return "You have no cards to be quizzed on."
+                    + "\nAdd one with: card <question> /a <answer>";
+        }
+
+        pendingCard = cards.pickRandom();
+        return "Quiz: " + pendingCard.getQuestion() + "\nType your answer.";
+    }
+
+    /**
+     * Marks the answer to the card that was waiting, then forgets it.
+     * <p>
+     * The answer is shown whether or not the user got it right, because a card
+     * the user missed is the one they most need to read. One question is asked
+     * per {@code quiz}, so the bot is never left waiting on an answer that does
+     * not come.
+     *
+     * @param attempt the whole line the user typed.
+     * @return whether it was right, and the answer either way.
+     */
+    private String gradeAnswer(String attempt) {
+        Card asked = pendingCard;
+        pendingCard = null;
+
+        if (asked.isAnsweredBy(attempt)) {
+            return "Correct.\n  " + asked.getQuestion() + " = " + asked.getAnswer()
+                    + "\nType quiz for another.";
+        }
+        return "Not quite.\n  " + asked.getQuestion() + " = " + asked.getAnswer()
+                + "\nType quiz to try again.";
+    }
+
+    /**
+     * Restores the saved deck, replacing whatever this bot held before.
+     * <p>
+     * Like {@link #loadTasks()}, a deck that cannot be read costs the deck, not
+     * the session, so the trouble comes back as words rather than as an
+     * Exception.
+     *
+     * @return an empty string when the deck was restored, or what went wrong.
+     */
+    public String loadCards() {
+        try {
+            cards = new CardList(cardStorage.load());
+            return "";
+        } catch (GudGoiException e) {
+            return e.getMessage();
+        }
+    }
+
 
     /**
      * Returns the words the bot opens with.
@@ -389,6 +540,11 @@ public class GudGoi {
             ui.showError(loadTrouble);
         }
 
+        String deckTrouble = loadCards();
+        if (!deckTrouble.isEmpty()) {
+            ui.showError(deckTrouble);
+        }
+
         while (true) {
             // Ui.readCommand answers "bye" at the end of input, so this one test
             // ends the session whether the user typed bye or the input ran out.
@@ -416,6 +572,6 @@ public class GudGoi {
      * @param args ignored; the bot takes no command line arguments.
      */
     public static void main(String[] args) {
-        new GudGoi(Path.of("data", "saved.txt")).run();
+        new GudGoi(Path.of("data", "saved.txt"), Path.of("data", "cards.txt")).run();
     }
 }

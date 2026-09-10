@@ -7,6 +7,8 @@
 // comments were generated. I reviewed the code before committing it.
 // The assertions that the line arrives trimmed, in parseCommandWord and
 // parseArguments, were generated the same way on 2026-09-10, for A-Assertions.
+// parseCard was generated the same way on 2026-09-10, for the D-Trivia
+// extension.
 // ---------------------------------------------------------------------
 
 package gudgoi;
@@ -18,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
+import gudgoi.exception.CardFormatException;
 import gudgoi.exception.DateFormatException;
 import gudgoi.exception.DeadlineFormatException;
 import gudgoi.exception.EventFormatException;
@@ -27,6 +30,7 @@ import gudgoi.exception.TodoFormatException;
 import gudgoi.task.Deadline;
 import gudgoi.task.Event;
 import gudgoi.task.Todo;
+import gudgoi.trivia.Card;
 
 /**
  * Turns what the user typed into something the program can act on.
@@ -149,6 +153,32 @@ public class Parser {
             throw new TodoFormatException();
         }
         return new Todo(description);
+    }
+
+    /**
+     * Builds a trivia card from the rest of a {@code card} command.
+     * <p>
+     * {@code /a} separates the question from its answer, matching the {@code /by}
+     * and {@code /from} the task commands already use, so the user meets one
+     * idea rather than two.
+     *
+     * @param details the command text after {@code card}, in the form
+     *                {@code question /a answer}.
+     * @return the card the user described.
+     * @throws CardFormatException if the question or the answer is missing.
+     */
+    public static Card parseCard(String details) throws CardFormatException {
+        String[] questionAndAnswer = details.split(" /a ", 2);
+        if (questionAndAnswer.length < 2) {
+            throw new CardFormatException();
+        }
+
+        String question = questionAndAnswer[0].trim();
+        String answer = questionAndAnswer[1].trim();
+        if (question.isEmpty() || answer.isEmpty()) {
+            throw new CardFormatException();
+        }
+        return new Card(question, answer);
     }
 
     /**

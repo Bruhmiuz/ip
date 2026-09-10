@@ -45,6 +45,9 @@ public class MainWindow extends Application {
     /** Where the agenda is kept, matching the console version exactly. */
     private static final Path SAVE_PATH = Path.of("data", "saved.txt");
 
+    /** Where the trivia deck is kept, matching the console version exactly. */
+    private static final Path CARD_PATH = Path.of("data", "cards.txt");
+
     /** Size of the window, which the user cannot change. */
     private static final double WINDOW_WIDTH = 400.0;
 
@@ -91,7 +94,7 @@ public class MainWindow extends Application {
             this.getClass().getResourceAsStream("/images/DaDuke.jpg"), 200, 200, true, true);
 
     /** The bot itself, the same class the console runs. */
-    private final GudGoi gudGoi = new GudGoi(SAVE_PATH);
+    private final GudGoi gudGoi = new GudGoi(SAVE_PATH, CARD_PATH);
 
     /** The conversation so far, one dialog box for each turn. */
     private final VBox dialogContainer = new VBox();
@@ -180,6 +183,11 @@ public class MainWindow extends Application {
         String loadTrouble = gudGoi.loadTasks();
         if (!loadTrouble.isEmpty()) {
             showBotSaying(loadTrouble);
+        }
+
+        String deckTrouble = gudGoi.loadCards();
+        if (!deckTrouble.isEmpty()) {
+            showBotSaying(deckTrouble);
         }
     }
 
