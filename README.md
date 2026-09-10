@@ -7,6 +7,17 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Use streams
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+10 September 2026, for A-Streams, from my decision on which loops in this
+codebase a stream actually makes clearer.
+
+* `src/main/java/gudgoi/GudGoi.java` — `numberMatching`, and the rewrite of
+  `listTasks` and `findTasks` to call it
+* `src/main/java/gudgoi/Storage.java` — the stream in `save`
+* `src/main/java/gudgoi/Ui.java` — the stream in `show`
+
 #### Improve code quality
 
 Claude (Anthropic), used through Claude Code, generated the code below on

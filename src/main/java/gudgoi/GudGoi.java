@@ -2,6 +2,9 @@ package gudgoi;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import gudgoi.exception.CommandNotFoundException;
 import gudgoi.exception.GudGoiException;
@@ -39,6 +42,8 @@ public class GudGoi {
     // describeTotal was extracted the same way on 2026-09-10, for
     // A-CodeQuality, when I noticed the two confirmations worded the total
     // differently.
+    // numberMatching, and the rewrite of listTasks and findTasks to use it,
+    // were generated the same way on 2026-09-10, for A-Streams.
     // ---------------------------------------------------------------------
 
     /** The one way in and out for anything the user sees or types. */
@@ -123,18 +128,7 @@ public class GudGoi {
         if (tasks.isEmpty()) {
             return "Nothing on the agenda yet.";
         }
-
-        List<Task> allTasks = tasks.asList();
-        StringBuilder list = new StringBuilder();
-        for (int i = 0; i < allTasks.size(); i++) {
-            // Tasks are numbered from 1 for the user, but indexed from 0 here.
-            // Task.toString() supplies the "[X] " or "[ ] " status box.
-            list.append(i + 1).append(".").append(allTasks.get(i));
-            if (i < allTasks.size() - 1) {
-                list.append("\n");
-            }
-        }
-        return list.toString();
+        return numberMatching(task -> true);
     }
 
     /**
@@ -153,25 +147,35 @@ public class GudGoi {
      */
     private String findTasks(String keyword) {
         String wanted = keyword.toLowerCase();
-        List<Task> allTasks = tasks.asList();
-
-        StringBuilder matches = new StringBuilder();
-        for (int i = 0; i < allTasks.size(); i++) {
-            Task task = allTasks.get(i);
-            if (!task.getDescription().toLowerCase().contains(wanted)) {
-                continue;
-            }
-            if (matches.length() > 0) {
-                matches.append("\n");
-            }
-            // The position the user would type, not the position among matches.
-            matches.append(i + 1).append(".").append(task);
-        }
-
-        if (matches.length() == 0) {
+        String matches = numberMatching(
+                task -> task.getDescription().toLowerCase().contains(wanted));
+        if (matches.isEmpty()) {
             return "Nothing on the agenda matches \"" + keyword + "\".";
         }
         return "Here are the matching tasks in your list:\n" + matches;
+    }
+
+    /**
+     * Numbers the tasks that pass a test, as one block of text.
+     * <p>
+     * The stream runs over positions rather than over the tasks themselves,
+     * because the number shown against a task has to be its place in the whole
+     * agenda. A stream of tasks would lose that: after a filter, the first task
+     * left is no longer the first task in the list, and {@code find} would
+     * number its results 1, 2, 3 while {@code mark} still expects the real
+     * positions.
+     *
+     * @param isWanted the test a task must pass to appear.
+     * @return the numbered tasks, one per line, or an empty string if none
+     *         passed.
+     */
+    private String numberMatching(Predicate<Task> isWanted) {
+        List<Task> allTasks = tasks.asList();
+        // Task.toString() supplies the "[X] " or "[ ] " status box.
+        return IntStream.range(0, allTasks.size())
+                .filter(position -> isWanted.test(allTasks.get(position)))
+                .mapToObj(position -> (position + 1) + "." + allTasks.get(position))
+                .collect(Collectors.joining("\n"));
     }
 
     /**

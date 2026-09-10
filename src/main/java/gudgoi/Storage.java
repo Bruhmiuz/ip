@@ -8,6 +8,7 @@
 // The save-file layout constants, and the split of parseSavedTask into
 // hasReadableShape, buildTask and timeAt, were generated the same way on
 // 2026-09-10, for A-CodeQuality.
+// The stream in save was generated the same way on 2026-09-10, for A-Streams.
 // ---------------------------------------------------------------------
 
 package gudgoi;
@@ -101,10 +102,11 @@ public class Storage {
         try {
             Files.createDirectories(this.file.getParent());
 
-            List<String> lines = new ArrayList<>();
-            for (Task task : tasks) {
-                lines.add(task.toSaveFormat());
-            }
+            // Each task already knows how to write itself, so the whole file
+            // is that one method applied down the list.
+            List<String> lines = tasks.stream()
+                    .map(Task::toSaveFormat)
+                    .toList();
             Files.write(this.file, lines);
         } catch (IOException e) {
             throw new TaskSaveException(e.getMessage());
