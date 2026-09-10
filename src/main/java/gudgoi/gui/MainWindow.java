@@ -6,6 +6,9 @@
 // which is course material. The wiring to GudGoi, the load of the saved
 // agenda and the close on "bye" were written for this project. I reviewed
 // the code before committing it.
+// start was split into layOutWindow, wireHandlers and startSession, and the
+// pixel sizes were moved into named constants, the same way on 2026-09-10,
+// for A-CodeQuality.
 // ---------------------------------------------------------------------
 
 package gudgoi.gui;
@@ -48,6 +51,24 @@ public class MainWindow extends Application {
     /** Height of the window, which the user cannot change. */
     private static final double WINDOW_HEIGHT = 600.0;
 
+    /** Width of the conversation area, inside the window's own width. */
+    private static final double SCROLL_WIDTH = 385.0;
+
+    /** Height of the conversation area, leaving room for the input row. */
+    private static final double SCROLL_HEIGHT = 535.0;
+
+    /** Width of the box the user types into. */
+    private static final double INPUT_WIDTH = 325.0;
+
+    /** Width of the Send button, filling the rest of the input row. */
+    private static final double SEND_BUTTON_WIDTH = 55.0;
+
+    /** Gap between a control and the window edge it is anchored to. */
+    private static final double EDGE_GAP = 1.0;
+
+    /** The scroll position that shows the newest message. */
+    private static final double SCROLL_TO_BOTTOM = 1.0;
+
     /**
      * How long the farewell stays on the screen before the window closes.
      * <p>
@@ -73,13 +94,16 @@ public class MainWindow extends Application {
     private final GudGoi gudGoi = new GudGoi(SAVE_PATH);
 
     /** The conversation so far, one dialog box for each turn. */
-    private VBox dialogContainer;
+    private final VBox dialogContainer = new VBox();
 
     /** The box the user types into. */
-    private TextField userInput;
+    private final TextField userInput = new TextField();
 
     /** The button that sends what was typed. */
-    private Button sendButton;
+    private final Button sendButton = new Button("Send");
+
+    /** The conversation area, which scrolls as the conversation grows. */
+    private final ScrollPane scrollPane = new ScrollPane();
 
     /**
      * Builds the window and starts the session.
@@ -90,11 +114,19 @@ public class MainWindow extends Application {
      */
     @Override
     public void start(Stage stage) {
-        ScrollPane scrollPane = new ScrollPane();
-        dialogContainer = new VBox();
+        layOutWindow(stage);
+        wireHandlers();
+        stage.show();
+        startSession();
+    }
+
+    /**
+     * Puts the controls in the window and gives each one its size and place.
+     *
+     * @param stage the window to fill.
+     */
+    private void layOutWindow(Stage stage) {
         scrollPane.setContent(dialogContainer);
-        userInput = new TextField();
-        sendButton = new Button("Send");
 
         AnchorPane mainLayout = new AnchorPane();
         mainLayout.getChildren().addAll(scrollPane, userInput, sendButton);
@@ -106,21 +138,24 @@ public class MainWindow extends Application {
         stage.setMinWidth(WINDOW_WIDTH);
 
         mainLayout.setPrefSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        scrollPane.setPrefSize(385, 535);
+        scrollPane.setPrefSize(SCROLL_WIDTH, SCROLL_HEIGHT);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        scrollPane.setVvalue(1.0);
+        scrollPane.setVvalue(SCROLL_TO_BOTTOM);
         scrollPane.setFitToWidth(true);
         dialogContainer.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        userInput.setPrefWidth(325.0);
-        sendButton.setPrefWidth(55.0);
+        userInput.setPrefWidth(INPUT_WIDTH);
+        sendButton.setPrefWidth(SEND_BUTTON_WIDTH);
 
-        AnchorPane.setTopAnchor(scrollPane, 1.0);
-        AnchorPane.setBottomAnchor(sendButton, 1.0);
-        AnchorPane.setRightAnchor(sendButton, 1.0);
-        AnchorPane.setLeftAnchor(userInput, 1.0);
-        AnchorPane.setBottomAnchor(userInput, 1.0);
+        AnchorPane.setTopAnchor(scrollPane, EDGE_GAP);
+        AnchorPane.setBottomAnchor(sendButton, EDGE_GAP);
+        AnchorPane.setRightAnchor(sendButton, EDGE_GAP);
+        AnchorPane.setLeftAnchor(userInput, EDGE_GAP);
+        AnchorPane.setBottomAnchor(userInput, EDGE_GAP);
+    }
 
+    /** Says what each control does when the user acts on it. */
+    private void wireHandlers() {
         // Both ways of sending lead to the same place, so that the mouse and
         // the keyboard are equally good.
         sendButton.setOnMouseClicked(event -> handleUserInput());
@@ -129,13 +164,18 @@ public class MainWindow extends Application {
         // The height changes only after the new rows have been laid out, which
         // is later than the moment they are added. Watching the height is
         // therefore the only way to scroll to a bottom that already exists.
-        dialogContainer.heightProperty().addListener(observable -> scrollPane.setVvalue(1.0));
+        dialogContainer.heightProperty()
+                .addListener(observable -> scrollPane.setVvalue(SCROLL_TO_BOTTOM));
+    }
 
-        stage.show();
-
-        // The greeting comes before the file is read, for the reason the
-        // console has: a user told about a save file by a bot that has not
-        // introduced itself does not know who is talking.
+    /**
+     * Greets the user, then restores the saved agenda.
+     * <p>
+     * The greeting comes before the file is read, for the reason the console
+     * has: a user told about a save file by a bot that has not introduced
+     * itself does not know who is talking.
+     */
+    private void startSession() {
         showBotSaying(gudGoi.getGreeting());
         String loadTrouble = gudGoi.loadTasks();
         if (!loadTrouble.isEmpty()) {

@@ -34,6 +34,9 @@ public class GudGoi {
     // The change from printing to returning text, and getGreeting, loadTasks,
     // getResponse and isExit, were generated the same way on 2026-09-05, for
     // Level-10, so that a window can use the same commands as the console.
+    // describeTotal was extracted the same way on 2026-09-10, for
+    // A-CodeQuality, when I noticed the two confirmations worded the total
+    // differently.
     // ---------------------------------------------------------------------
 
     /** The one way in and out for anything the user sees or types. */
@@ -84,7 +87,20 @@ public class GudGoi {
             throw e;
         }
         return "Got it. I've added this task:\n  " + task
-                + "\nNow you have " + tasks.size()
+                + "\n" + describeTotal();
+    }
+
+    /**
+     * Returns the running total, worded for the number of tasks there are.
+     * <p>
+     * Both the add and the delete confirmations end with this sentence. It is
+     * written once so that the two cannot drift apart, which they had: one
+     * said "1 task" while the other said "1 task(s)".
+     *
+     * @return the running total as a sentence, worded for the count.
+     */
+    private String describeTotal() {
+        return "Now you have " + tasks.size()
                 + (tasks.size() == 1 ? " task" : " tasks") + " in the list.";
     }
 
@@ -223,7 +239,7 @@ public class GudGoi {
             throw e;
         }
         return "Noted. I've removed this task:\n  " + task
-                + "\nNow you have " + tasks.size() + " task(s) in the list.";
+                + "\n" + describeTotal();
     }
 
     /**

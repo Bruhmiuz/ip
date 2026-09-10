@@ -7,6 +7,22 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Improve code quality
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+10 September 2026, for A-CodeQuality, from my decision on which of the course
+code quality guidelines this codebase actually breaches.
+
+* `src/main/java/gudgoi/gui/MainWindow.java` — the split of `start` into
+  `layOutWindow`, `wireHandlers` and `startSession`, and the named size
+  constants
+* `src/main/java/gudgoi/Storage.java` — the save-file layout constants, and
+  `hasReadableShape`, `buildTask`, `buildTodo`, `buildDeadline`, `buildEvent`,
+  `descriptionOf` and `timeAt`
+* `src/main/java/gudgoi/GudGoi.java` — `describeTotal`
+* `src/main/java/gudgoi/task/Task.java` — the change of `getTypeIcon` and
+  `getTypeLetter` to abstract methods
+
 #### Let Ui.show take a line for each argument
 
 Claude (Anthropic), used through Claude Code, generated the code below on
