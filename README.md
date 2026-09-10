@@ -18,6 +18,22 @@ codebase a stream actually makes clearer.
 * `src/main/java/gudgoi/Storage.java` — the stream in `save`
 * `src/main/java/gudgoi/Ui.java` — the stream in `show`
 
+#### Improve code quality
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+10 September 2026, for A-CodeQuality, from my decision on which of the course
+code quality guidelines this codebase actually breaches.
+
+* `src/main/java/gudgoi/gui/MainWindow.java` — the split of `start` into
+  `layOutWindow`, `wireHandlers` and `startSession`, and the named size
+  constants
+* `src/main/java/gudgoi/Storage.java` — the save-file layout constants, and
+  `hasReadableShape`, `buildTask`, `buildTodo`, `buildDeadline`, `buildEvent`,
+  `descriptionOf` and `timeAt`
+* `src/main/java/gudgoi/GudGoi.java` — `describeTotal`
+* `src/main/java/gudgoi/task/Task.java` — the change of `getTypeIcon` and
+  `getTypeLetter` to abstract methods
+
 #### Add assertions
 
 Claude (Anthropic), used through Claude Code, generated the code below on

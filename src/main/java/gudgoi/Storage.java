@@ -5,6 +5,9 @@
 // from GudGoi, where I had written them for Level-7 and Level-8; the class,
 // the constructor and the change from printing to raising an Exception were
 // generated. I reviewed the code before committing it.
+// The save-file layout constants, and the split of parseSavedTask into
+// hasReadableShape, buildTask and timeAt, were generated the same way on
+// 2026-09-10, for A-CodeQuality.
 // The stream in save was generated the same way on 2026-09-10, for A-Streams.
 // ---------------------------------------------------------------------
 
@@ -35,6 +38,39 @@ import gudgoi.task.Todo;
  * and a window later.
  */
 public class Storage {
+    /** Where the type letter sits on a save-file line. */
+    private static final int FIELD_TYPE = 0;
+
+    /** Where the done flag sits: {@code 1} for done, {@code 0} for not done. */
+    private static final int FIELD_DONE = 1;
+
+    /** Where the description sits. */
+    private static final int FIELD_DESCRIPTION = 2;
+
+    /**
+     * Where the first time sits: a deadline's due time, or an event's start.
+     * A todo has no field here.
+     */
+    private static final int FIELD_FIRST_TIME = 3;
+
+    /** Where an event's end time sits. No other type has a field here. */
+    private static final int FIELD_SECOND_TIME = 4;
+
+    /** How many fields a todo line has: type, done flag and description. */
+    private static final int FIELD_COUNT_TODO = 3;
+
+    /** How many fields a deadline line has: a todo's three, plus the due time. */
+    private static final int FIELD_COUNT_DEADLINE = 4;
+
+    /** How many fields an event line has: a todo's three, plus start and end. */
+    private static final int FIELD_COUNT_EVENT = 5;
+
+    /** The done flag as it is written for a task that is done. */
+    private static final String DONE_FLAG = "1";
+
+    /** The done flag as it is written for a task that is still to do. */
+    private static final String NOT_DONE_FLAG = "0";
+
     /** The file the agenda is kept in. */
     private final Path file;
 
@@ -167,32 +203,13 @@ public class Storage {
         // A separator is a | that no backslash protects. The lookbehind is what
         // keeps an escaped \| inside a description from splitting the line.
         String[] fields = line.trim().split("\\s*(?<!\\\\)\\|\\s*");
-        if (fields.length < 3) {
+        if (!hasReadableShape(fields)) {
             return null;
         }
 
-        // The done flag is the only field with a fixed set of values, so it is
-        // the cheapest place to notice that a line is not one of ours.
-        if (!fields[1].equals("0") && !fields[1].equals("1")) {
-            return null;
-        }
-
-        // Each type has an exact field count. A line with more fields than its
-        // type allows is not a line this program wrote, so it is rejected
-        // rather than read in part.
-        String description = unescape(fields[2]);
         try {
-            Task task = switch (fields[0]) {
-                case "T" -> fields.length != 3 ? null : new Todo(description);
-                case "D" -> fields.length != 4 ? null
-                        : new Deadline(description, LocalDateTime.parse(fields[3]));
-                case "E" -> fields.length != 5 ? null
-                        : new Event(description, LocalDateTime.parse(fields[3]),
-                        LocalDateTime.parse(fields[4]));
-                default -> null;
-            };
-
-            if (task != null && fields[1].equals("1")) {
+            Task task = buildTask(fields);
+            if (task != null && fields[FIELD_DONE].equals(DONE_FLAG)) {
                 task.mark();
             }
             return task;
@@ -201,6 +218,80 @@ public class Storage {
             // program. A file written before Level-8 lands here.
             return null;
         }
+    }
+
+    /**
+     * Tells whether the fields could have come from a line this program wrote.
+     * <p>
+     * The done flag is the only field with a fixed set of values, so it is the
+     * cheapest place to notice that a line is not one of ours.
+     *
+     * @param fields one save-file line, already split.
+     * @return true if the line is worth reading further.
+     */
+    private static boolean hasReadableShape(String[] fields) {
+        if (fields.length < FIELD_COUNT_TODO) {
+            return false;
+        }
+        return fields[FIELD_DONE].equals(NOT_DONE_FLAG)
+                || fields[FIELD_DONE].equals(DONE_FLAG);
+    }
+
+    /**
+     * Builds the task the type letter calls for, still marked as not done.
+     * <p>
+     * Each type has an exact field count. A line with the wrong number of
+     * fields for its type is not a line this program wrote, so it is rejected
+     * rather than read in part.
+     *
+     * @param fields one save-file line, already split and of a readable shape.
+     * @return the task the line describes, or {@code null} if the type letter
+     *         is unknown or the field count does not match it.
+     */
+    private static Task buildTask(String[] fields) {
+        return switch (fields[FIELD_TYPE]) {
+            case "T" -> fields.length == FIELD_COUNT_TODO ? buildTodo(fields) : null;
+            case "D" -> fields.length == FIELD_COUNT_DEADLINE ? buildDeadline(fields) : null;
+            case "E" -> fields.length == FIELD_COUNT_EVENT ? buildEvent(fields) : null;
+            default -> null;
+        };
+    }
+
+    /** Builds a todo from a line already known to have a todo's field count. */
+    private static Todo buildTodo(String[] fields) {
+        return new Todo(descriptionOf(fields));
+    }
+
+    /** Builds a deadline from a line already known to have a deadline's field count. */
+    private static Deadline buildDeadline(String[] fields) {
+        return new Deadline(descriptionOf(fields), timeAt(fields, FIELD_FIRST_TIME));
+    }
+
+    /** Builds an event from a line already known to have an event's field count. */
+    private static Event buildEvent(String[] fields) {
+        return new Event(descriptionOf(fields), timeAt(fields, FIELD_FIRST_TIME),
+                timeAt(fields, FIELD_SECOND_TIME));
+    }
+
+    /**
+     * Returns the description field, with any escaped separator put back.
+     *
+     * @param fields one save-file line, already split.
+     * @return the description the user typed.
+     */
+    private static String descriptionOf(String[] fields) {
+        return unescape(fields[FIELD_DESCRIPTION]);
+    }
+
+    /**
+     * Reads one time field of a save-file line.
+     *
+     * @param fields one save-file line, already split.
+     * @param index which field to read.
+     * @return the point in time the field names.
+     */
+    private static LocalDateTime timeAt(String[] fields, int index) {
+        return LocalDateTime.parse(fields[index]);
     }
 
     /**
