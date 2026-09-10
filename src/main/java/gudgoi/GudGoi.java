@@ -34,6 +34,8 @@ public class GudGoi {
     // The change from printing to returning text, and getGreeting, loadTasks,
     // getResponse and isExit, were generated the same way on 2026-09-05, for
     // Level-10, so that a window can use the same commands as the console.
+    // The assertions that check each undo path left the agenda as the command
+    // found it were generated the same way on 2026-09-10, for A-Assertions.
     // describeTotal was extracted the same way on 2026-09-10, for
     // A-CodeQuality, when I noticed the two confirmations worded the total
     // differently.
@@ -79,13 +81,21 @@ public class GudGoi {
      *                           case the task is taken out again.
      */
     private String addAndConfirm(Task task) throws TaskSaveException {
+        int sizeBefore = tasks.size();
         tasks.add(task);
         try {
             storage.save(tasks.asList());
         } catch (TaskSaveException e) {
             tasks.removeLast();
+            // The undo has to leave the agenda exactly as the command found
+            // it, because the file was never written. Anything else and the
+            // list on screen no longer matches the file on disk.
+            assert tasks.size() == sizeBefore
+                    : "undone add left " + tasks.size() + " tasks, not " + sizeBefore;
             throw e;
         }
+        assert tasks.size() == sizeBefore + 1
+                : "a saved add did not grow the agenda by one";
         return "Got it. I've added this task:\n  " + task
                 + "\n" + describeTotal();
     }
@@ -187,6 +197,10 @@ public class GudGoi {
             if (!wasMarked) {
                 task.unmark();
             }
+            // The file was never written, so the task has to go back to the
+            // state the command found it in.
+            assert task.isMarked() == wasMarked
+                    : "undone mark left the task in the wrong state";
             throw e;
         }
         return "Nice! I've marked this task as done:\n  " + task;
@@ -213,6 +227,8 @@ public class GudGoi {
             if (wasMarked) {
                 task.mark();
             }
+            assert task.isMarked() == wasMarked
+                    : "undone unmark left the task in the wrong state";
             throw e;
         }
         return "OK, I've marked this task as not done yet:\n  " + task;
@@ -231,11 +247,16 @@ public class GudGoi {
     private String deleteTask(String number)
             throws GudGoiException {
         int position = Parser.parsePosition(number);
+        int sizeBefore = tasks.size();
         Task task = tasks.remove(position);
         try {
             storage.save(tasks.asList());
         } catch (TaskSaveException e) {
+            // The position came from this same list a moment ago, so insert
+            // needs no bounds check of its own. Its assertion holds us to that.
             tasks.insert(position, task);
+            assert tasks.size() == sizeBefore
+                    : "undone delete left " + tasks.size() + " tasks, not " + sizeBefore;
             throw e;
         }
         return "Noted. I've removed this task:\n  " + task

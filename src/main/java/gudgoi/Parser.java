@@ -5,6 +5,8 @@
 // from GudGoi, where I had written them over Level-4 to Level-8; the class,
 // the split of a line into a command word and its arguments, and the header
 // comments were generated. I reviewed the code before committing it.
+// The assertions that the line arrives trimmed, in parseCommandWord and
+// parseArguments, were generated the same way on 2026-09-10, for A-Assertions.
 // ---------------------------------------------------------------------
 
 package gudgoi;
@@ -76,6 +78,11 @@ public class Parser {
      * @return the command word, or the whole line when it holds one word.
      */
     public static String parseCommandWord(String line) {
+        // A caller that forgets to trim gets an empty command word, and then
+        // every command the user types looks unknown. The mistake is the
+        // caller's, so it is caught here rather than reported to the user.
+        assert line != null && line.equals(line.trim())
+                : "untrimmed line: \"" + line + "\"";
         return line.split(" ", 2)[0];
     }
 
@@ -86,6 +93,8 @@ public class Parser {
      * @return the rest of the line, or an empty string when there is no rest.
      */
     public static String parseArguments(String line) {
+        assert line != null && line.equals(line.trim())
+                : "untrimmed line: \"" + line + "\"";
         String[] parts = line.split(" ", 2);
         return parts.length > 1 ? parts[1] : "";
     }
