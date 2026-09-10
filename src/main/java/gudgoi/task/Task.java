@@ -11,6 +11,8 @@
 // committing it. The class was made abstract, and its constructor protected,
 // the same way on 2026-09-04, from my decision that every real task is a todo,
 // a deadline or an event.
+// getTypeIcon and getTypeLetter were made abstract the same way on 2026-09-10,
+// for A-CodeQuality, from my decision that no task has an empty type.
 // ---------------------------------------------------------------------
 
 package gudgoi.task;
@@ -89,24 +91,25 @@ public abstract class Task {
 
     /**
      * Returns the letter box shown before the status box, for example
-     * {@code [T]}. A plain task has no letter; each subclass supplies its own.
+     * {@code [T]}.
+     * <p>
+     * It is abstract because there is no such thing as a task with no type:
+     * every task is a todo, a deadline or an event. A default of {@code ""}
+     * would be a value no task ever has, and a new subclass could inherit it
+     * by mistake. Leaving it abstract makes the compiler ask for the answer.
      *
      * @return the type marker for this kind of task.
      */
-    protected String getTypeIcon() {
-        return "";
-    }
+    protected abstract String getTypeIcon();
 
     /**
      * Returns the single letter that identifies this kind of task in the save
-     * file, for example {@code T}. A plain task has no letter; each subclass
-     * supplies its own.
+     * file, for example {@code T}. Abstract for the same reason as
+     * {@link #getTypeIcon()}.
      *
      * @return the type letter for this kind of task.
      */
-    protected String getTypeLetter() {
-        return "";
-    }
+    protected abstract String getTypeLetter();
 
     /**
      * Returns the task as one line of the save file, for example
