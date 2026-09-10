@@ -5,6 +5,9 @@
 // remove is my Level-5 code, moved from taskAt in GudGoi; the class, the
 // constructors and the rest were generated. I reviewed the code before
 // committing it.
+// The assertions in insert and removeLast, and the Javadoc that explains
+// them, were generated the same way on 2026-09-10, for A-Assertions, from my
+// decision that those two methods carry preconditions their callers must meet.
 // ---------------------------------------------------------------------
 
 package gudgoi;
@@ -106,12 +109,21 @@ public class TaskList {
      * <p>
      * It exists so that a delete that could not be saved can be undone, and
      * the agenda on screen still matches the file. It takes no position it has
-     * not held before, so it does not check the bounds.
+     * not held before, so it raises no {@link OutOfBoundException}: a position
+     * that names nothing here is this program's mistake, not the user's, and
+     * the assertion below says so.
+     * <p>
+     * The upper bound is {@code size() + 1} rather than {@code size()},
+     * because the task was taken out before this method puts it back. The end
+     * of the list is therefore a position it may legally have come from.
      *
      * @param position where the task sat, counting from 1.
      * @param task the task to put back.
      */
     public void insert(int position, Task task) {
+        assert position >= 1 && position <= this.tasks.size() + 1
+                : "insert at " + position + " into a list of " + this.tasks.size();
+        assert task != null : "insert of a null task";
         this.tasks.add(position - 1, task);
     }
 
@@ -119,12 +131,13 @@ public class TaskList {
      * Takes the most recently added task out again.
      * <p>
      * Like {@link #insert}, it exists to undo a change that could not be
-     * saved. It does nothing to an empty agenda.
+     * saved. Its only caller has just added the task it is taking out again,
+     * so an empty agenda here means the undo ran without the change it was
+     * meant to undo.
      */
     public void removeLast() {
-        if (!this.tasks.isEmpty()) {
-            this.tasks.remove(this.tasks.size() - 1);
-        }
+        assert !this.tasks.isEmpty() : "removeLast on an empty agenda";
+        this.tasks.remove(this.tasks.size() - 1);
     }
 
     /**

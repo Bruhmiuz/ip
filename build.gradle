@@ -40,6 +40,11 @@ dependencies {
 test {
     useJUnitPlatform()
 
+    // Assertions are off unless the JVM is started with -ea. Without this the
+    // assert statements in the source would never run, under test or anywhere
+    // else, and would be worth nothing.
+    enableAssertions = true
+
     testLogging {
         events 'passed', 'skipped', 'failed'
 
@@ -71,6 +76,10 @@ shadowJar {
 
 run {
     standardInput = System.in
+
+    // The same reason as in `test`: `gradlew run` is how the program is tried
+    // by hand, so it is where a broken assumption should show itself.
+    enableAssertions = true
 }
 
 checkstyle {
