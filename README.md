@@ -7,6 +7,29 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Move the window layout into FXML
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+14 September 2026, for A-BetterGui, following part 4 of the JavaFX tutorial at
+<https://se-education.org/guides/tutorials/javaFxPart4.html>, which is course
+material. The two FXML files and the split into a loader and a controller come
+from that tutorial. My decisions were that the controller should not extend a
+layout class, and that the greeting should still run as soon as the bot is
+handed over.
+
+* `src/main/resources/view/MainWindow.fxml` — whole file
+* `src/main/resources/view/DialogBox.fxml` — whole file
+* `src/main/java/gudgoi/gui/Main.java` — whole file
+* `src/main/java/gudgoi/gui/MainWindow.java` — the rewrite from an
+  `Application` that builds its own layout into an FXML controller:
+  `initialize`, `setGudGoi`, the `@FXML` fields, and the removal of
+  `layOutWindow`, `wireHandlers` and `startSession`
+* `src/main/java/gudgoi/gui/DialogBox.java` — the FXML loading in the
+  constructor, the `@FXML` fields, and the removal of the hand-built row
+* `src/main/java/gudgoi/gui/Launcher.java` — the change of the launched class
+  from `MainWindow` to `Main`
+* `build.gradle` — the three `javafx-fxml` dependencies
+
 #### Guard a save path that has no folder
 
 Claude (Anthropic), used through Claude Code, generated the code below on
