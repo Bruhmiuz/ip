@@ -5,7 +5,10 @@
 // JavaFX tutorial at
 // https://se-education.org/guides/tutorials/javaFxPart4.html, which is
 // course material. The save paths and the window title were moved here from
-// the hand-written MainWindow. I reviewed the code before committing it.
+// the hand-written MainWindow. The smallest usable window size was added
+// by the same tool on 2026-09-15, following part 5 of the tutorial at
+// https://se-education.org/guides/tutorials/javaFxPart5.html.
+// I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
 package gudgoi.gui;
@@ -41,6 +44,21 @@ public class Main extends Application {
     /** The layout of the window, read at start-up. */
     private static final String LAYOUT = "/view/MainWindow.fxml";
 
+    /**
+     * The narrowest the window may be made.
+     * <p>
+     * Below this the Send button starts to eat the box the user types into.
+     */
+    private static final double MIN_WIDTH = 300.0;
+
+    /**
+     * The shortest the window may be made.
+     * <p>
+     * Below this the input row is all that is left, and the conversation it
+     * belongs to is not visible at all.
+     */
+    private static final double MIN_HEIGHT = 200.0;
+
     /** The bot itself, the same class the console runs. */
     private final GudGoi gudGoi = new GudGoi(SAVE_PATH, CARD_PATH);
 
@@ -61,7 +79,13 @@ public class Main extends Application {
 
             stage.setScene(new Scene(root));
             stage.setTitle("Gud Goi");
-            stage.setResizable(false);
+
+            // The window may now be resized. Every control in the layout is
+            // anchored to an edge, so the conversation takes whatever room is
+            // given to it. A floor is still needed: a window small enough to
+            // hide its own input box cannot be typed into.
+            stage.setMinWidth(MIN_WIDTH);
+            stage.setMinHeight(MIN_HEIGHT);
             stage.show();
 
             // Only now does the controller exist, so only now can it be given

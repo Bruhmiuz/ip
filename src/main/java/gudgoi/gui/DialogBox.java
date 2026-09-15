@@ -4,7 +4,10 @@
 // on 2026-09-05, for Level-10, and rewritten by the same tool on 2026-09-14,
 // for A-BetterGui, to follow part 4 of the JavaFX tutorial at
 // https://se-education.org/guides/tutorials/javaFxPart4.html, which is
-// course material. I reviewed the code before committing it.
+// course material. The round face, the reply style class and the error
+// style were added by the same tool on 2026-09-15, following part 5 of the
+// tutorial at https://se-education.org/guides/tutorials/javaFxPart5.html.
+// I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
 package gudgoi.gui;
@@ -21,6 +24,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 
 /**
  * One turn of the conversation: what was said, beside the face that said it.
@@ -43,6 +47,12 @@ import javafx.scene.layout.HBox;
 public class DialogBox extends HBox {
     /** The layout of one row, read once for each box that is made. */
     private static final String LAYOUT = "/view/DialogBox.fxml";
+
+    /**
+     * Half the width of the face, which is also the radius of the circle the
+     * face is cut to. It must match {@code fitWidth} in the layout.
+     */
+    private static final double FACE_RADIUS = 19.0;
 
     /** The words, filled in by FXML. */
     @FXML
@@ -72,6 +82,11 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(face);
+
+        // A square photograph in a column of rounded bubbles is the one hard
+        // edge on the screen. Cutting it to a circle costs one shape and makes
+        // the row read as a single thing.
+        displayPicture.setClip(new Circle(FACE_RADIUS, FACE_RADIUS, FACE_RADIUS));
     }
 
     /**
@@ -88,13 +103,18 @@ public class DialogBox extends HBox {
     /**
      * Builds the row for something the bot said.
      *
-     * @param text the answer from the bot.
-     * @param face the picture of the bot.
+     * @param text    the answer from the bot.
+     * @param face    the picture of the bot.
+     * @param isError true when the answer is a refusal, which is drawn in red
+     *                so that the user sees it before reading it.
      * @return the row, mirrored so that the face comes first.
      */
-    public static DialogBox getBotDialog(String text, Image face) {
+    public static DialogBox getBotDialog(String text, Image face, boolean isError) {
         DialogBox box = new DialogBox(text, face);
         box.flip();
+        if (isError) {
+            box.markAsError();
+        }
         return box;
     }
 
@@ -112,5 +132,19 @@ public class DialogBox extends HBox {
         ObservableList<Node> reversed = FXCollections.observableArrayList(this.getChildren());
         FXCollections.reverse(reversed);
         this.getChildren().setAll(reversed);
+
+        // The bubble is mirrored too: its square corner has to point back at
+        // the speaker, and the fill says which side of the conversation it is.
+        dialog.getStyleClass().add("reply-label");
+    }
+
+    /**
+     * Draws this bubble as a refusal.
+     * <p>
+     * The style class is added rather than set, so that it lands on top of
+     * the reply style and changes only the colors, not the shape.
+     */
+    private void markAsError() {
+        dialog.getStyleClass().add("error-label");
     }
 }

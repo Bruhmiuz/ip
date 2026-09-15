@@ -6,7 +6,11 @@
 // https://se-education.org/guides/tutorials/javaFxPart4.html, which is
 // course material. The layout moved out to MainWindow.fxml; the session
 // start, the empty-line guard and the close on "bye" are this project's own
-// and were kept unchanged. I reviewed the code before committing it.
+// and were kept unchanged. On 2026-09-15, the same tool added the error
+// flag that showBotSaying passes on, following part 5 of the tutorial at
+// https://se-education.org/guides/tutorials/javaFxPart5.html, which styles
+// a reply by the kind of command that caused it.
+// I reviewed the code before committing it.
 // ---------------------------------------------------------------------
 
 package gudgoi.gui;
@@ -70,15 +74,15 @@ public class MainWindow {
      * The faces, shrunk as they are read rather than on every frame.
      * <p>
      * The last two arguments ask for the shape to be kept and for the good
-     * filter. 200 is asked for although 100 is shown, to leave room for a
+     * filter. 120 is asked for although 38 is shown, to leave room for a
      * screen that draws more pixels than it counts.
      */
     private final Image userFace = new Image(
-            this.getClass().getResourceAsStream("/images/DaUser.jpg"), 200, 200, true, true);
+            this.getClass().getResourceAsStream("/images/DaUser.jpg"), 120, 120, true, true);
 
     /** The face of the bot. */
     private final Image botFace = new Image(
-            this.getClass().getResourceAsStream("/images/DaDuke.jpg"), 200, 200, true, true);
+            this.getClass().getResourceAsStream("/images/DaDuke.jpg"), 120, 120, true, true);
 
     /**
      * Finishes the set-up that FXML cannot describe.
@@ -108,15 +112,19 @@ public class MainWindow {
         assert bot != null : "the window cannot run without a bot";
         this.gudGoi = bot;
 
-        showBotSaying(gudGoi.getGreeting());
+        showBotSaying(gudGoi.getGreeting(), false);
+
+        // A save file that could not be read is something the user has to know
+        // about and may have to act on, so it is shown the way a refused
+        // command is rather than as ordinary chatter.
         String loadTrouble = gudGoi.loadTasks();
         if (!loadTrouble.isEmpty()) {
-            showBotSaying(loadTrouble);
+            showBotSaying(loadTrouble, true);
         }
 
         String deckTrouble = gudGoi.loadCards();
         if (!deckTrouble.isEmpty()) {
-            showBotSaying(deckTrouble);
+            showBotSaying(deckTrouble, true);
         }
     }
 
@@ -139,7 +147,11 @@ public class MainWindow {
         }
 
         dialogContainer.getChildren().add(DialogBox.getUserDialog(typed, userFace));
-        showBotSaying(gudGoi.getResponse(typed));
+
+        // The answer is asked for first and judged second. wasLastAnswerAnError
+        // reports on the most recent call, so the order matters.
+        String answer = gudGoi.getResponse(typed);
+        showBotSaying(answer, gudGoi.wasLastAnswerAnError());
         userInput.clear();
 
         if (gudGoi.isExit(typed)) {
@@ -150,10 +162,12 @@ public class MainWindow {
     /**
      * Adds one bubble from the bot to the conversation.
      *
-     * @param words what the bot has to say.
+     * @param words   what the bot has to say.
+     * @param isError true when the words are a refusal, which is drawn in a
+     *                format of its own so that it is seen before it is read.
      */
-    private void showBotSaying(String words) {
-        dialogContainer.getChildren().add(DialogBox.getBotDialog(words, botFace));
+    private void showBotSaying(String words, boolean isError) {
+        dialogContainer.getChildren().add(DialogBox.getBotDialog(words, botFace, isError));
     }
 
     /**
