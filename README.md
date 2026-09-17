@@ -7,6 +7,19 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Test the command layer
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+17 September 2026, for A-MoreTesting, from my decision that the command layer
+had no tests at all, that the quiz and the undo-on-failure paths are where a
+fault would cost the user their data, and that a failed write is best forced by
+putting the save path inside a plain file rather than by changing file
+permissions, which behave differently on each operating system.
+
+* `src/test/java/gudgoi/GudGoiTest.java` — whole file
+* `src/test/java/gudgoi/task/TaskTest.java` — whole file
+* `src/test/java/gudgoi/ParserTest.java` — the eight `parseCard` tests
+
 #### Style the window, and set refusals apart
 
 Claude (Anthropic), used through Claude Code, generated the code below on
