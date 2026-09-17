@@ -7,6 +7,54 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Style the window, and set refusals apart
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+15 September 2026, for A-BetterGui, following part 5 of the JavaFX tutorial at
+<https://se-education.org/guides/tutorials/javaFxPart5.html>, which is course
+material. The two stylesheets, the edge anchoring and the per-reply style class
+follow that tutorial. My decisions were that the one thing worth a format of
+its own is a refused command, that the faces should be small and round because
+the window is narrow, and that every color belongs in one block so that a
+later change of personality is a single edit.
+
+* `src/main/resources/view/main.css` — whole file
+* `src/main/resources/view/dialog-box.css` — whole file
+* `src/main/resources/view/MainWindow.fxml` — the edge anchors that let the
+  window be resized, and the stylesheet link
+* `src/main/resources/view/DialogBox.fxml` — the smaller face, the spacing,
+  and the stylesheet link
+* `src/main/java/gudgoi/GudGoi.java` — `wasLastAnswerAnError` and its getter
+* `src/main/java/gudgoi/gui/Main.java` — `MIN_WIDTH`, `MIN_HEIGHT`, and the
+  removal of the fixed window size
+* `src/main/java/gudgoi/gui/MainWindow.java` — the error flag passed through
+  `showBotSaying`, and the smaller requested face size
+* `src/main/java/gudgoi/gui/DialogBox.java` — `markAsError`, the circular clip
+  on the face, and the `reply-label` class added in `flip`
+
+#### Move the window layout into FXML
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+14 September 2026, for A-BetterGui, following part 4 of the JavaFX tutorial at
+<https://se-education.org/guides/tutorials/javaFxPart4.html>, which is course
+material. The two FXML files and the split into a loader and a controller come
+from that tutorial. My decisions were that the controller should not extend a
+layout class, and that the greeting should still run as soon as the bot is
+handed over.
+
+* `src/main/resources/view/MainWindow.fxml` — whole file
+* `src/main/resources/view/DialogBox.fxml` — whole file
+* `src/main/java/gudgoi/gui/Main.java` — whole file
+* `src/main/java/gudgoi/gui/MainWindow.java` — the rewrite from an
+  `Application` that builds its own layout into an FXML controller:
+  `initialize`, `setGudGoi`, the `@FXML` fields, and the removal of
+  `layOutWindow`, `wireHandlers` and `startSession`
+* `src/main/java/gudgoi/gui/DialogBox.java` — the FXML loading in the
+  constructor, the `@FXML` fields, and the removal of the hand-built row
+* `src/main/java/gudgoi/gui/Launcher.java` — the change of the launched class
+  from `MainWindow` to `Main`
+* `build.gradle` — the three `javafx-fxml` dependencies
+
 #### Guard a save path that has no folder
 
 Claude (Anthropic), used through Claude Code, generated the code below on

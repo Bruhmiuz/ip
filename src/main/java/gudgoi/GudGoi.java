@@ -48,6 +48,9 @@ public class GudGoi {
     // differently.
     // numberMatching, and the rewrite of listTasks and findTasks to use it,
     // were generated the same way on 2026-09-10, for A-Streams.
+    // wasLastAnswerAnError and its getter were generated the same way on
+    // 2026-09-15, for A-BetterGui, so that the window can show a refused
+    // command in a format of its own.
     // ---------------------------------------------------------------------
 
     /** The one way in and out for anything the user sees or types. */
@@ -80,6 +83,20 @@ public class GudGoi {
      * decide what it means in the middle of a quiz.
      */
     private Card pendingCard;
+
+    /**
+     * Whether the last answer from {@link #getResponse} was a refusal.
+     * <p>
+     * The window shows a refused command in a format of its own, so it has to
+     * be able to tell one apart from an ordinary answer. The console does not
+     * ask, because it cannot change how text looks.
+     * <p>
+     * A field is used rather than a richer return type because one boolean is
+     * all any caller has needed so far. If the window later wants a different
+     * format for each kind of command, this is the thing to replace, not to
+     * add to.
+     */
+    private boolean wasLastAnswerAnError = false;
 
     /**
      * Builds a bot that keeps its agenda in one file.
@@ -498,6 +515,8 @@ public class GudGoi {
      */
     public String getResponse(String input) {
         String line = input.trim();
+        wasLastAnswerAnError = false;
+
         if (isExit(line)) {
             return ui.getFarewell();
         }
@@ -505,8 +524,21 @@ public class GudGoi {
         try {
             return handle(line);
         } catch (GudGoiException e) {
+            wasLastAnswerAnError = true;
             return e.getMessage();
         }
+    }
+
+    /**
+     * Tells whether the last answer from {@link #getResponse} was a refusal.
+     * <p>
+     * Ask this straight after {@code getResponse}, about that same answer. Any
+     * later call replaces what it reports.
+     *
+     * @return true when the last command was refused.
+     */
+    public boolean wasLastAnswerAnError() {
+        return wasLastAnswerAnError;
     }
 
     /**
