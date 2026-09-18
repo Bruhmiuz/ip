@@ -1,6 +1,6 @@
 # iP roadmap
 
-Fetched 2026-08-20 from the AY26/27 S1 course website. Weeks 2 and 3 re-fetched 2026-08-27. Later weeks are subject to change — re-fetch before relying on them.
+Fetched 2026-08-20 from the AY26/27 S1 course website. Weeks 2 and 3 re-fetched 2026-08-27. Week 6 re-fetched 2026-09-14; see `week6-plan.md`. Later weeks are subject to change — re-fetch before relying on them.
 
 ## Week arc
 
