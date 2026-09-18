@@ -7,6 +7,18 @@ newest first. Each entry names the files and the methods involved. The same
 information appears as a comment beside the code itself. Entries start with the
 commits of 27 August 2026; earlier commits carry the code comments only.
 
+#### Correct the example in the deadline error message
+
+Claude (Anthropic), used through Claude Code, generated the code below on
+18 September 2026, after I noticed the complaint about a malformed deadline
+still told the user to write `/by Sunday`, which Level-8 stopped accepting.
+
+* `src/main/java/gudgoi/exception/DeadlineFormatException.java` — the
+  corrected example, and the comment saying why it has to be a working
+  command
+* `src/test/java/gudgoi/GudGoiTest.java` — `isExampleFromComplaintAccepted`
+  and the two tests that feed each complaint's own example back in
+
 #### Test the command layer
 
 Claude (Anthropic), used through Claude Code, generated the code below on

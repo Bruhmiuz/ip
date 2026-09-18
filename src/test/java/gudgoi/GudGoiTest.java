@@ -382,6 +382,35 @@ public class GudGoiTest {
         assertEquals("1.[D][ ] submit iP (by: Sep 18 2026, 23:59)", second.getResponse("list"));
     }
 
+    // ---------- an error message must not suggest a command that fails ----------
+
+    /**
+     * Feeds the example back to the bot.
+     * <p>
+     * A complaint about a command format ends with an example, indented on its
+     * own line. This takes that last line and runs it. If the example is not
+     * itself a working command, the user is sent straight into a second error,
+     * which is what the deadline message did until 18 September 2026: it still
+     * showed {@code /by Sunday}, the free text that Level-8 stopped accepting.
+     */
+    private boolean isExampleFromComplaintAccepted(String badCommand) {
+        GudGoi bot = botIn(folder);
+        String complaint = bot.getResponse(badCommand);
+        String example = complaint.lines().reduce((first, second) -> second).orElseThrow().trim();
+        bot.getResponse(example);
+        return !bot.wasLastAnswerAnError();
+    }
+
+    @Test
+    public void deadlineComplaint_theExampleItShows_isAcceptedByTheParser() {
+        assertTrue(isExampleFromComplaintAccepted("deadline"));
+    }
+
+    @Test
+    public void eventComplaint_theExampleItShows_isAcceptedByTheParser() {
+        assertTrue(isExampleFromComplaintAccepted("event"));
+    }
+
     @Test
     public void savedDeck_readBackByAFreshBot_comesBackUnchanged() {
         GudGoi first = botIn(folder);
