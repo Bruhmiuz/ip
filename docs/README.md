@@ -235,8 +235,15 @@ part answers with a working example you can copy.
 
 Both are plain text and are rewritten after every change that succeeds.
 
-Two things are worth knowing:
+Three things are worth knowing:
 
+* **Run one copy at a time, and do not edit the files by hand while it runs.**
+  Gud Goi reads a file once, when it starts, and writes the whole file back
+  after every change. It never re-reads. So an edit made from outside while
+  Gud Goi is running is invisible to it, and the next change you make
+  overwrites that edit without warning. Two copies of Gud Goi running in the
+  same folder will destroy each other's work the same way. Close it before you
+  edit a file by hand.
 * **A change that cannot be saved is undone.** If the file cannot be written,
   Gud Goi puts your list back the way it was and tells you. What you see on
   screen always matches what is on disk.
